@@ -4,22 +4,29 @@ Android mobile-app project for https://www.acutemedicaltake.org.
 
 ## Architecture
 
-The first Android release uses Capacitor 8 as a native Android shell around the live Acute Medical Take website. This preserves the existing clinical website as the source of truth while allowing native Android features to be added progressively.
+The first Android release uses Capacitor 8 as a native Android shell around the live Acute Medical Take website. The website remains the source of truth for clinical content while the app progressively adds native mobile navigation, local storage, offline content and AMT Pro functionality.
 
-## Current v1 foundation
+## Android Phase 1 — completed
 
-- Capacitor Android-ready project
 - App ID: `org.acutemedicaltake.app`
 - App name: `Acute Medical Take`
 - Live production source: `https://www.acutemedicaltake.org`
-- HTTPS-only navigation
-- Native network-status support
-- Branded local fallback screen
-- Mobile safe-area styling
+- Native-style Android home screen
+- Bottom navigation: Home, Search, Saved, More
+- Clinical pathway navigator
+- Emergency, Calculators and AMT Pro quick-access buttons
+- Local pathway search
+- Device-stored favourites using Capacitor Preferences
+- Native haptic feedback on key interactions
+- Native browser handoff to live AMT clinical content
+- Online/offline network indicator
+- Mobile safe-area support
+- Clinical disclaimer and version screen
+- Responsive phone layout
 
-## Generate the Android project
+## Generate the native Android project
 
-On a Mac or Windows computer with Node.js installed:
+On a Mac or Windows computer with Node.js and Android Studio installed:
 
 ```bash
 npm install
@@ -29,20 +36,29 @@ npx cap sync android
 npx cap open android
 ```
 
-Android Studio will open the generated native project.
+The final command opens the generated project in Android Studio.
 
-## Planned AMT mobile features
+## Test locally before Android Studio
 
-1. Native bottom navigation
-2. Favourite pathways
+```bash
+npm install
+npm run dev
+```
+
+Open the local Vite address shown in Terminal to inspect the Phase 1 mobile shell in a browser.
+
+## Phase 2
+
+1. Replace generic live-site handoff with verified deep links to individual AMT pathways
+2. Offline emergency pack
 3. Recently viewed pathways
-4. Offline emergency pack
-5. AMT Pro login and entitlement
-6. MRCP Part 2 question bank
-7. Interactive acute medicine scenarios
-8. Learning progress tracking
-9. Push notifications for important content updates
-10. Google Play production release
+4. AMT Pro authentication and entitlement
+5. MRCP Part 2 question bank
+6. Interactive acute medicine scenarios
+7. Learning progress dashboard
+8. Push notifications for important content updates
+9. Native AMT launcher icon and splash screen
+10. Google Play signed App Bundle (`.aab`) release workflow
 
 ## Clinical governance
 
