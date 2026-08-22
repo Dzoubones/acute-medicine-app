@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AcuteMedicalTake.Starting" parent="Theme.AcuteMedicalTake">
+        <item name="android:windowSplashScreenBackground">@color/amt_navy</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/amt_navy</item>
+        <item name="android:postSplashScreenTheme">@style/Theme.AcuteMedicalTake</item>
+    </style>
+</resources>
