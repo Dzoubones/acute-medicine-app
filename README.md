@@ -2,100 +2,80 @@
 
 Android mobile-app project for https://www.acutemedicaltake.org.
 
-## Architecture
+## Current native Android build
 
-The Android release uses Capacitor 8 as a native shell around Acute Medical Take while progressively adding native mobile features. The live website remains the source of truth for full clinical content and evidence updates; selected emergency orientation material and learning content are stored locally in the app.
-
-## Android Phase 1 — completed
+The repository now contains a real `android/` project that can be opened directly in Android Studio or built in GitHub Actions.
 
 - App ID: `org.acutemedicaltake.app`
 - App name: `Acute Medical Take`
-- Bottom navigation: Home, Search, Saved, More
+- Version: `1.1.0` (`versionCode 1`)
+- Minimum Android: API 26
+- Compile SDK: API 36
+- Target SDK: API 36
+- Java: 17
+- Android Gradle Plugin: 9.3.0
+- Gradle used in CI: 9.5.0
+- HTTPS-only live content from `acutemedicaltake.org`
+- Native AMT launcher icon
+- Native splash screen
+- Deep-link intent filters for `acutemedicaltake.org`
+- Offline fallback screen
+
+Google Play requires new apps and app updates to target Android 16 / API 36 from 31 August 2026, so this project is already configured for that requirement.
+
+## Build the first installable APK automatically
+
+Open the GitHub repository, select **Actions**, then select **Android build** and run the workflow if it is not already running.
+
+The workflow installs Android 16 SDK, JDK 17 and Gradle 9.5, then produces:
+
+- `acute-medical-take-debug-apk` — installable Android APK for testing
+- `acute-medical-take-release-aab-unsigned` — release App Bundle prepared for the later signing step
+
+The debug APK can be installed on an Android device after allowing installation from the chosen source.
+
+## Build locally in Android Studio
+
+Open the `android/` directory in Android Studio. Install Android SDK Platform 36 and Build Tools 36.0.0 if prompted.
+
+From a terminal you can also run:
+
+```bash
+gradle -p android assembleDebug
+gradle -p android bundleRelease
+```
+
+Expected outputs:
+
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
+android/app/build/outputs/bundle/release/app-release.aab
+```
+
+## Google Play signing
+
+The current release AAB is intentionally unsigned because the Play upload key must remain private. Before production submission, create or use an Android upload keystore, store it securely, configure release signing, and add the SHA-256 certificate fingerprint to the Digital Asset Links file at:
+
+```text
+https://www.acutemedicaltake.org/.well-known/assetlinks.json
+```
+
+Do not commit the keystore or its passwords to GitHub.
+
+## Existing AMT mobile features
+
+The web/native-ready layer already contains the Phase 1/2 work:
+
+- Home, Search, Saved and More navigation
 - Clinical pathway navigator
 - Device-stored favourites
-- Local pathway search
-- Haptic feedback
-- Native browser handoff
-- Online/offline status
-- Responsive mobile-safe layout
-
-## Android Phase 2 — completed in web/native-ready layer
-
-- Offline emergency pack with:
-  - Cardiac arrest
-  - Anaphylaxis
-  - Suspected sepsis
-  - Severe hyperkalaemia
-  - Life-threatening asthma
-- Safety notes that direct clinicians back to current national/local algorithms for exact doses and definitive management
+- Emergency and calculator shortcuts
+- Offline emergency orientation material
 - AMT Pro area
-- Five original MRCP Part 2-style starter questions
-- Immediate answer feedback and explanations
-- Direct pathway-review action from each MRCP question
-- Deep-link listener prepared using Capacitor App `appUrlOpen`
-- Version updated to 1.1.0
+- Starter MRCP Part 2-style questions
+- Answer explanations and pathway-review actions
 
-## Generate the native Android project
-
-On a Mac or Windows computer with Node.js and Android Studio installed:
-
-```bash
-npm install
-npm run build
-npx cap add android
-npx cap sync android
-npx cap open android
-```
-
-The final command opens the generated project in Android Studio.
-
-## Test the app locally first
-
-```bash
-npm install
-npm run dev
-```
-
-Open the Vite address shown in Terminal.
-
-## Native Android deep-link activation
-
-The JavaScript app is ready to receive links from `acutemedicaltake.org`, but Android must also be told that this app owns those web links.
-
-After `npx cap add android`, edit:
-
-`android/app/src/main/AndroidManifest.xml`
-
-Inside the main Activity, add an intent filter similar to:
-
-```xml
-<intent-filter android:autoVerify="true">
-    <action android:name="android.intent.action.VIEW" />
-    <category android:name="android.intent.category.DEFAULT" />
-    <category android:name="android.intent.category.BROWSABLE" />
-    <data android:scheme="https" android:host="www.acutemedicaltake.org" />
-    <data android:scheme="https" android:host="acutemedicaltake.org" />
-</intent-filter>
-```
-
-For verified Android App Links, publish a valid Digital Asset Links file at:
-
-`https://www.acutemedicaltake.org/.well-known/assetlinks.json`
-
-That file must contain the final Android package name and the SHA-256 fingerprint of the signing certificate used for the Play Store build.
-
-## Next Android stage
-
-1. Generate and commit the actual `android/` native project
-2. Set target/compile SDK to the current Google Play requirement
-3. Add AMT launcher icon and splash screen assets
-4. Add recently viewed pathways
-5. Expand MRCP Part 2 question bank
-6. Add interactive acute medicine scenarios
-7. Add AMT Pro authentication/entitlement
-8. Add learning progress tracking
-9. Add push notifications
-10. Build and sign the Google Play `.aab`
+The current native Android activity provides the installable shell and opens the live AMT website securely. The next integration stage is to bundle the richer Phase 1/2 web shell into the native project so those local features run directly inside the APK.
 
 ## Clinical governance
 
