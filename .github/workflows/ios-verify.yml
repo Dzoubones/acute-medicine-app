@@ -1,0 +1,101 @@
+name: iOS verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/regenerate-ios
+    paths:
+      - '.github/workflows/ios-verify.yml'
+      - 'ios/**'
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'capacitor.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.*'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/ios-verify.yml'
+      - 'ios/**'
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'capacitor.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  simulator-build:
+    name: Unsigned iOS simulator build
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync web assets and Capacitor plugins
+        run: npm run ios:sync
+
+      - name: Verify App Store identity and version
+        shell: bash
+        run: |
+          set -euo pipefail
+          project='ios/App/App.xcodeproj/project.pbxproj'
+          config='ios/App/App/capacitor.config.json'
+
+          test "$(grep -Fc 'PRODUCT_BUNDLE_IDENTIFIER = uk.acutemedicine.acutemedicaltake;' "$project")" -eq 2
+          test "$(grep -Fc 'MARKETING_VERSION = 1.0.0;' "$project")" -eq 2
+          test "$(grep -Fc 'CURRENT_PROJECT_VERSION = 1;' "$project")" -eq 2
+
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+
+          const config = JSON.parse(
+            readFileSync('ios/App/App/capacitor.config.json', 'utf8')
+          );
+
+          if (config.appId !== 'uk.acutemedicine.acutemedicaltake') {
+            throw new Error(`Unexpected iOS app ID: ${config.appId}`);
+          }
+
+          if (config.server?.url !== 'https://www.acutemedicaltake.org') {
+            throw new Error(`Unexpected server URL: ${config.server?.url}`);
+          }
+          NODE
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build without signing
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/AcuteMedicalTakeDerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            clean build

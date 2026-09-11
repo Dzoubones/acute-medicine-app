@@ -9,7 +9,7 @@ Medical Take iPhone app.
 
 - Bundle ID: `uk.acutemedicine.acutemedicaltake`
 - App name: `Acute Medical Take`
-- Version: `1.1.0` (build `1`)
+- Version: `1.0.0` (build `1`)
 - Minimum iOS: 15.0
 - HTTPS-only live content from `www.acutemedicaltake.org`
 - Native AMT launcher icon and splash screen

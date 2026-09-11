@@ -5,7 +5,7 @@
 - Xcode project: `ios/App/App.xcodeproj`
 - Bundle identifier: `uk.acutemedicine.acutemedicaltake`
 - Display name: `Acute Medical Take`
-- Version: `1.1.0`
+- Version: `1.0.0`
 - Build number: `1`
 - Minimum iOS version: `15.0`
 - Live content: `https://www.acutemedicaltake.org`
