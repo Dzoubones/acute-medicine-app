@@ -7,3 +7,7 @@ dist/
 android/.gradle/
 android/local.properties
 android/app/build/
+ios/App/DerivedData/
+ios/App/build/
+*.xcuserstate
+xcuserdata/
