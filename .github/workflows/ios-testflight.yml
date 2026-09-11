@@ -1,0 +1,175 @@
+name: Upload iOS build to TestFlight
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/ios-testflight.yml'
+  workflow_dispatch:
+    inputs:
+      build_number:
+        description: App Store Connect build number
+        required: true
+        default: '1'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: acute-medical-take-testflight
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    name: Cloud-sign and upload to TestFlight
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[upload-testflight]')
+    runs-on: macos-latest
+    timeout-minutes: 45
+    env:
+      APPLE_TEAM_ID: WY6W336UZG
+      APP_BUNDLE_ID: uk.acutemedicine.acutemedicaltake
+      APP_VERSION: 1.0.0
+      BUILD_NUMBER: ${{ inputs.build_number || '1' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Validate protected inputs
+        shell: bash
+        env:
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$BUILD_NUMBER" =~ ^[1-9][0-9]*$ ]]; then
+            echo 'Build number must be a positive integer.' >&2
+            exit 1
+          fi
+
+          for secret_name in ASC_ISSUER_ID ASC_KEY_ID ASC_PRIVATE_KEY; do
+            if [[ -z "${!secret_name}" ]]; then
+              echo "Required GitHub secret is missing: $secret_name" >&2
+              exit 1
+            fi
+          done
+
+          if [[ "$ASC_PRIVATE_KEY" != *'-----BEGIN PRIVATE KEY-----'* ]] || \
+             [[ "$ASC_PRIVATE_KEY" != *'-----END PRIVATE KEY-----'* ]]; then
+            echo 'The App Store Connect private key is not a complete .p8 key.' >&2
+            exit 1
+          fi
+
+          echo "::add-mask::$ASC_ISSUER_ID"
+          echo "::add-mask::$ASC_KEY_ID"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync web assets and Capacitor plugins
+        run: npm run ios:sync
+
+      - name: Set and verify release identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          project='ios/App/App.xcodeproj/project.pbxproj'
+
+          BUILD_NUMBER="$BUILD_NUMBER" perl -0pi -e \
+            's/CURRENT_PROJECT_VERSION = [0-9]+;/CURRENT_PROJECT_VERSION = $ENV{BUILD_NUMBER};/g' \
+            "$project"
+
+          test "$(grep -Fc "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID;" "$project")" -eq 2
+          test "$(grep -Fc "MARKETING_VERSION = $APP_VERSION;" "$project")" -eq 2
+          test "$(grep -Fc "CURRENT_PROJECT_VERSION = $BUILD_NUMBER;" "$project")" -eq 2
+
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+
+          const config = JSON.parse(
+            readFileSync('ios/App/App/capacitor.config.json', 'utf8')
+          );
+
+          if (config.appId !== process.env.APP_BUNDLE_ID) {
+            throw new Error(`Unexpected iOS app ID: ${config.appId}`);
+          }
+
+          if (config.server?.url !== 'https://www.acutemedicaltake.org') {
+            throw new Error(`Unexpected server URL: ${config.server?.url}`);
+          }
+          NODE
+
+      - name: Prepare App Store Connect authentication
+        shell: bash
+        env:
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          key_directory="$RUNNER_TEMP/appstoreconnect/private_keys"
+          key_path="$key_directory/AuthKey_${ASC_KEY_ID}.p8"
+
+          umask 077
+          mkdir -p "$key_directory"
+          printf '%s\n' "$ASC_PRIVATE_KEY" > "$key_path"
+          echo "ASC_KEY_PATH=$key_path" >> "$GITHUB_ENV"
+          echo "ASC_ISSUER_ID=$ASC_ISSUER_ID" >> "$GITHUB_ENV"
+          echo "ASC_KEY_ID=$ASC_KEY_ID" >> "$GITHUB_ENV"
+
+      - name: Create signed archive
+        shell: bash
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/AcuteMedicalTake.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            clean archive
+
+      - name: Cloud-sign and upload to App Store Connect
+        shell: bash
+        run: |
+          set -euo pipefail
+          export_options="$RUNNER_TEMP/ExportOptions.plist"
+
+          /usr/libexec/PlistBuddy -c 'Add :method string app-store-connect' "$export_options"
+          /usr/libexec/PlistBuddy -c 'Add :destination string upload' "$export_options"
+          /usr/libexec/PlistBuddy -c 'Add :signingStyle string automatic' "$export_options"
+          /usr/libexec/PlistBuddy -c "Add :teamID string $APPLE_TEAM_ID" "$export_options"
+          /usr/libexec/PlistBuddy -c 'Add :manageAppVersionAndBuildNumber bool false' "$export_options"
+          /usr/libexec/PlistBuddy -c 'Add :stripSwiftSymbols bool true' "$export_options"
+          /usr/libexec/PlistBuddy -c 'Add :uploadSymbols bool true' "$export_options"
+
+          xcodebuild \
+            -exportArchive \
+            -archivePath "$RUNNER_TEMP/AcuteMedicalTake.xcarchive" \
+            -exportPath "$RUNNER_TEMP/TestFlightExport" \
+            -exportOptionsPlist "$export_options" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      - name: Remove temporary authentication key
+        if: always()
+        shell: bash
+        run: rm -f "${ASC_KEY_PATH:-}"
