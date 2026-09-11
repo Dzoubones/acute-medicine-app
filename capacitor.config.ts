@@ -1,7 +1,12 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
+const isIosBuild = process.env.CAPACITOR_PLATFORM === 'ios';
+
 const config: CapacitorConfig = {
-  appId: 'org.acutemedicaltake.app',
+  // Preserve the identifiers already established for each store platform.
+  appId: isIosBuild
+    ? 'uk.acutemedicine.acutemedicaltake'
+    : 'org.acutemedicaltake.app',
   appName: 'Acute Medical Take',
   webDir: 'dist',
   server: {
@@ -11,6 +16,11 @@ const config: CapacitorConfig = {
   },
   android: {
     allowMixedContent: false
+  },
+  ios: {
+    contentInset: 'automatic',
+    preferredContentMode: 'mobile',
+    scrollEnabled: true
   }
 };
 

@@ -1,6 +1,31 @@
-# Acute Medical Take — Android
+# Acute Medical Take — Mobile
 
-Android mobile-app project for https://www.acutemedicaltake.org.
+Native iOS and Android mobile-app projects for https://www.acutemedicaltake.org.
+
+## Current native iOS build
+
+The `ios/` directory contains the regenerated Xcode project for the Acute
+Medical Take iPhone app.
+
+- Bundle ID: `uk.acutemedicine.acutemedicaltake`
+- App name: `Acute Medical Take`
+- Version: `1.0.0` (build `1`)
+- Minimum iOS: 15.0
+- HTTPS-only live content from `www.acutemedicaltake.org`
+- Native AMT launcher icon and splash screen
+- Swift Package Manager integration for Capacitor plugins
+
+On a Mac, install dependencies and open the project in Xcode:
+
+```bash
+npm ci
+npm run ios:sync
+npm run ios:open
+```
+
+Select the Apple Developer team in Xcode before archiving. Signing credentials
+and provisioning profiles are intentionally not stored in this repository.
+See `docs/IOS-RELEASE.md` for the final TestFlight workflow.
 
 ## Current native Android build
 
