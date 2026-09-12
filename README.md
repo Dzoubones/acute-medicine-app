@@ -4,14 +4,18 @@ Native iOS and Android mobile-app projects for https://www.acutemedicaltake.org.
 
 ## Current native iOS build
 
-The `ios/` directory contains the regenerated Xcode project for the Acute
-Medical Take iPhone app.
+The `ios/` directory contains the review Xcode project for iPhone, iPad,
+WidgetKit and Apple Watch.
 
 - Bundle ID: `uk.acutemedicine.acutemedicaltake`
 - App name: `Acute Medical Take`
-- Version: `1.0.0` (build `1`)
+- Version: `1.0.0` (build `2`)
 - Minimum iOS: 15.0
-- HTTPS-only live content from `www.acutemedicaltake.org`
+- Bundled offline-first interface; no production Capacitor `server.url`
+- HTTPS-only, user-initiated links to `www.acutemedicaltake.org`
+- Device-only Take Mode and optional local clinical timers
+- CryptoKit/Keychain personal notes protected by device authentication
+- iPhone/iPad widgets, App Intents and watchOS companion
 - Native AMT launcher icon and splash screen
 - Swift Package Manager integration for Capacitor plugins
 
@@ -25,7 +29,10 @@ npm run ios:open
 
 Select the Apple Developer team in Xcode before archiving. Signing credentials
 and provisioning profiles are intentionally not stored in this repository.
-See `docs/IOS-RELEASE.md` for the final TestFlight workflow.
+See [the build 2 review dossier](docs/ios-build-2-review.md),
+[Apple Developer configuration](docs/apple-developer-configuration.md), and
+[manual test plan](docs/manual-test-plan.md). Build 2 must not be uploaded or
+submitted until explicitly approved.
 
 ## Current native Android build
 

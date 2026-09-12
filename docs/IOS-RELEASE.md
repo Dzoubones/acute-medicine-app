@@ -6,9 +6,12 @@
 - Bundle identifier: `uk.acutemedicine.acutemedicaltake`
 - Display name: `Acute Medical Take`
 - Version: `1.0.0`
-- Build number: `1`
+- Build number: `2`
 - Minimum iOS version: `15.0`
-- Live content: `https://www.acutemedicaltake.org`
+- Primary content: bundled application assets, available offline
+- Optional live reference: `https://www.acutemedicaltake.org` through Capacitor Browser
+- Extension IDs: `uk.acutemedicine.acutemedicaltake.widgets` and `uk.acutemedicine.acutemedicaltake.watch`
+- App Group: `group.uk.acutemedicine.acutemedicaltake`
 - Package manager: Swift Package Manager
 
 The iOS project, web bundle, AMT icon, splash screen and Capacitor plugins are
@@ -25,11 +28,13 @@ credential is stored in the project.
    team under Signing & Capabilities.
 6. Keep the bundle identifier as `uk.acutemedicine.acutemedicaltake` if that
    identifier is already registered in the Apple Developer account.
-7. Test on a physical iPhone as well as an iPhone simulator.
+7. Configure the identifiers and App Group in `apple-developer-configuration.md`.
+8. Test on a physical iPhone and paired Watch as well as iPhone/iPad simulators.
 
 ## Required release checks
 
-- The homepage loads from `www.acutemedicaltake.org` over HTTPS.
+- The primary interface launches from bundled assets without a network connection.
+- The labelled complete-website action opens `www.acutemedicaltake.org` over HTTPS.
 - Clinical pathways, search, calculators and external guideline links open.
 - Back navigation, rotation, safe-area spacing and keyboard behaviour work.
 - Loss of connectivity produces a clear, non-misleading state.
@@ -47,4 +52,5 @@ credential is stored in the project.
 5. Release first through TestFlight, complete device testing, and only then
    submit for App Review.
 
-The regenerated project has not been signed, uploaded or submitted to Apple.
+Build 2 has not been signed, uploaded or submitted to Apple. Follow the approval
+gate and test status in `ios-build-2-review.md`.

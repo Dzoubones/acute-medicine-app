@@ -16,6 +16,16 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
+		695A8EADC46A45EB9940B78D /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E531F80B06846599F4ADD5B /* MainViewController.swift */; };
+		89AA08B79C98467EAF36C2DA /* AMTNativeFeaturesPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA37E52A7E42477BA20560F8 /* AMTNativeFeaturesPlugin.swift */; };
+		FCE968FD6D2B4C98811480C5 /* AMTAppIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692223706D7B4DEA9711422B /* AMTAppIntents.swift */; };
+		C615E91E3313454CA6921EB8 /* AMTWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7133AB7BE4C44D41827E02E0 /* AMTWidgets.swift */; };
+		48EA87FEA0F14859A8319917 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 431F4A64B0214FC88ECF9E2A /* Info.plist */; };
+		5E5A6A9B801D4C2D98B68B47 /* AMTWidgets.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 5BC07DC1E6974201ADB4533E /* AMTWidgets.entitlements */; };
+		0819ECA3583549E8B8F7CF5A /* AMTWidgets.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = 25FAA04CC78C4DFF8890ECDC /* AMTWidgets.appex */; };
+		6ADE04D089F5418AB2274347 /* AMTWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B0C65CBAD07454189C4994C /* AMTWatchApp.swift */; };
+		C53D1122D972429981A055CB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1E375AB2562E47A8A87BDACB /* Info.plist */; };
+		45EAD1C6082F49169F9C5D14 /* AMTWatch.app in Copy Files */ = {isa = PBXBuildFile; fileRef = F0DD302DDAD5411A9C82163C /* AMTWatch.app */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +40,17 @@
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		9582B6822FE993A50072D4E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		5E531F80B06846599F4ADD5B /* MainViewController.swift */ = {isa = PBXFileReference; name = "MainViewController.swift"; path = "MainViewController.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		AA37E52A7E42477BA20560F8 /* AMTNativeFeaturesPlugin.swift */ = {isa = PBXFileReference; name = "AMTNativeFeaturesPlugin.swift"; path = "AMTNativeFeaturesPlugin.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		692223706D7B4DEA9711422B /* AMTAppIntents.swift */ = {isa = PBXFileReference; name = "AMTAppIntents.swift"; path = "AMTAppIntents.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		73AF7AD3ED794E7A9A7364F3 /* App.entitlements */ = {isa = PBXFileReference; name = "App.entitlements"; path = "App.entitlements"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		7133AB7BE4C44D41827E02E0 /* AMTWidgets.swift */ = {isa = PBXFileReference; name = "AMTWidgets.swift"; path = "AMTWidgets/AMTWidgets.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		431F4A64B0214FC88ECF9E2A /* Info.plist */ = {isa = PBXFileReference; name = "Info.plist"; path = "AMTWidgets/Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
+		5BC07DC1E6974201ADB4533E /* AMTWidgets.entitlements */ = {isa = PBXFileReference; name = "AMTWidgets.entitlements"; path = "AMTWidgets/AMTWidgets.entitlements"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		25FAA04CC78C4DFF8890ECDC /* AMTWidgets.appex */ = {isa = PBXFileReference; name = "AMTWidgets.appex"; path = "AMTWidgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; fileEncoding = undefined; lastKnownFileType = undefined; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; };
+		3B0C65CBAD07454189C4994C /* AMTWatchApp.swift */ = {isa = PBXFileReference; name = "AMTWatchApp.swift"; path = "AMTWatch/AMTWatchApp.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		1E375AB2562E47A8A87BDACB /* Info.plist */ = {isa = PBXFileReference; name = "Info.plist"; path = "AMTWatch/Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
+		F0DD302DDAD5411A9C82163C /* AMTWatch.app */ = {isa = PBXFileReference; name = "AMTWatch.app"; path = "AMTWatch.app"; sourceTree = BUILT_PRODUCTS_DIR; fileEncoding = undefined; lastKnownFileType = undefined; explicitFileType = "wrapper.application"; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +59,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22E5809273DF45309F003F96 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		780B70BF915242E090FCB320 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,6 +85,8 @@
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
+				F841FC35B5264401B021A162 /* AMTWidgets */,
+				572D15B6AAAE4FE9A10EDCAA /* AMTWatch */,
 			);
 			sourceTree = "<group>";
 		};
@@ -57,6 +94,8 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+				25FAA04CC78C4DFF8890ECDC /* AMTWidgets.appex */,
+				F0DD302DDAD5411A9C82163C /* AMTWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -73,8 +112,31 @@
 				504EC3131FED79650016851F /* Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
+				5E531F80B06846599F4ADD5B /* MainViewController.swift */,
+				AA37E52A7E42477BA20560F8 /* AMTNativeFeaturesPlugin.swift */,
+				692223706D7B4DEA9711422B /* AMTAppIntents.swift */,
+				73AF7AD3ED794E7A9A7364F3 /* App.entitlements */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		F841FC35B5264401B021A162 /* AMTWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				7133AB7BE4C44D41827E02E0 /* AMTWidgets.swift */,
+				431F4A64B0214FC88ECF9E2A /* Info.plist */,
+				5BC07DC1E6974201ADB4533E /* AMTWidgets.entitlements */,
+			);
+			name = AMTWidgets;
+			sourceTree = "<group>";
+		};
+		572D15B6AAAE4FE9A10EDCAA /* AMTWatch */ = {
+			isa = PBXGroup;
+			children = (
+				3B0C65CBAD07454189C4994C /* AMTWatchApp.swift */,
+				1E375AB2562E47A8A87BDACB /* Info.plist */,
+			);
+			name = AMTWatch;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -87,10 +149,14 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				591020DDE3E84E3ABC3FE84C /* Copy Files */,
+				6E65EB4F78824B84A786FE8E /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				100B938A8B3B465484472815 /* PBXTargetDependency */,
+				419C66603678447C8E358E8C /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -100,14 +166,48 @@
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		8B720DFB13D54F1E874A71FE /* "AMTWidgets" */ = {
+			isa = PBXNativeTarget;
+			name = "AMTWidgets";
+			productName = "AMTWidgets";
+			productReference = 25FAA04CC78C4DFF8890ECDC;
+			productType = "com.apple.product-type.app-extension";
+			buildConfigurationList = A2CCE7B1B0FA442BB09243E2;
+			buildPhases = (
+				B90E1F6DEF1D4B799601690D /* Sources */,
+				22E5809273DF45309F003F96 /* Frameworks */,
+				A84A900CBD3B435A8EEE5FF2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+		};
+		B8656878DE0248FA963B99DA /* "AMTWatch" */ = {
+			isa = PBXNativeTarget;
+			name = "AMTWatch";
+			productName = "AMTWatch";
+			productReference = F0DD302DDAD5411A9C82163C;
+			productType = "com.apple.product-type.application.watchapp2";
+			buildConfigurationList = E636067CA2864EBE841FC2E7;
+			buildPhases = (
+				EEA7C93E39FF4E3FA0A4D37F /* Sources */,
+				780B70BF915242E090FCB320 /* Frameworks */,
+				B69798D7A12D4AD897AEB4BC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		504EC2FC1FED79650016851F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0920;
+				LastSwiftUpdateCheck = 920;
+				LastUpgradeCheck = 920;
 				TargetAttributes = {
 					504EC3031FED79650016851F = {
 						CreatedOnToolsVersion = 9.2;
@@ -133,6 +233,8 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+				8B720DFB13D54F1E874A71FE /* "AMTWidgets" */,
+				B8656878DE0248FA963B99DA /* "AMTWatch" */,
 			);
 		};
 /* End PBXProject section */
@@ -151,6 +253,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A84A900CBD3B435A8EEE5FF2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B69798D7A12D4AD897AEB4BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -160,6 +276,25 @@
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
+				695A8EADC46A45EB9940B78D /* MainViewController.swift in Sources */,
+				89AA08B79C98467EAF36C2DA /* AMTNativeFeaturesPlugin.swift in Sources */,
+				FCE968FD6D2B4C98811480C5 /* AMTAppIntents.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B90E1F6DEF1D4B799601690D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C615E91E3313454CA6921EB8 /* AMTWidgets.swift" in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EEA7C93E39FF4E3FA0A4D37F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6ADE04D089F5418AB2274347 /* AMTWatchApp.swift" in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,7 +350,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -272,7 +406,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -300,7 +433,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -314,6 +447,9 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
+				DEVELOPMENT_TEAM = WY6W336UZG;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 			};
 			name = Debug;
 		};
@@ -322,7 +458,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -335,8 +471,103 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
+				DEVELOPMENT_TEAM = WY6W336UZG;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 			};
 			name = Release;
+		};
+		80764AA91D7D4D7DBD02BF8A /* Debug */ = {
+			name = Debug;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = AMTWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = uk.acutemedicine.acutemedicaltake.widgets;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = AMTWidgets/AMTWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = WY6W336UZG;
+				GENERATE_INFOPLIST_FILE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+		};
+		DFE197F6A2654B969AF069B4 /* Release */ = {
+			name = Release;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = AMTWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = uk.acutemedicine.acutemedicaltake.widgets;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = AMTWidgets/AMTWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = WY6W336UZG;
+				GENERATE_INFOPLIST_FILE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+		};
+		A96504FA35444460AE0BE10E /* Debug */ = {
+			name = Debug;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = AMTWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = uk.acutemedicine.acutemedicaltake.watch;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = WY6W336UZG;
+				GENERATE_INFOPLIST_FILE = NO;
+				MARKETING_VERSION = 1.0.0;
+				SDKROOT = watchos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+		};
+		E8B9CA6BA4E148A08DE5D0C0 /* Release */ = {
+			name = Release;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = AMTWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = uk.acutemedicine.acutemedicaltake.watch;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = WY6W336UZG;
+				GENERATE_INFOPLIST_FILE = NO;
+				MARKETING_VERSION = 1.0.0;
+				SDKROOT = watchos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
 		};
 /* End XCBuildConfiguration section */
 
@@ -359,6 +590,24 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		A2CCE7B1B0FA442BB09243E2 /* Build configuration list for PBXNativeTarget "AMTWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80764AA91D7D4D7DBD02BF8A /* Debug */,
+				DFE197F6A2654B969AF069B4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E636067CA2864EBE841FC2E7 /* Build configuration list for PBXNativeTarget "AMTWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A96504FA35444460AE0BE10E /* Debug */,
+				E8B9CA6BA4E148A08DE5D0C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -375,6 +624,61 @@
 			productName = "CapApp-SPM";
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		C3A7448979F548A8BF0E5893 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B720DFB13D54F1E874A71FE;
+			remoteInfo = "AMTWidgets";
+		};
+		DFA6CAEAE66643EF811ECBC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B8656878DE0248FA963B99DA;
+			remoteInfo = "AMTWatch";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		100B938A8B3B465484472815 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B720DFB13D54F1E874A71FE /* "AMTWidgets" */;
+			targetProxy = C3A7448979F548A8BF0E5893 /* PBXContainerItemProxy */;
+		};
+		419C66603678447C8E358E8C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B8656878DE0248FA963B99DA /* "AMTWatch" */;
+			targetProxy = DFA6CAEAE66643EF811ECBC3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		591020DDE3E84E3ABC3FE84C /* Copy Files */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0819ECA3583549E8B8F7CF5A /* AMTWidgets.appex in Copy Files */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			name = "Copy Files";
+			dstPath = "";
+			dstSubfolderSpec = 13;
+		};
+		6E65EB4F78824B84A786FE8E /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				45EAD1C6082F49169F9C5D14 /* "AMTWatch.app" in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			name = "Embed Watch Content";
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+		};
+/* End PBXCopyFilesBuildPhase section */
 	};
 	rootObject = 504EC2FC1FED79650016851F /* Project object */;
 }

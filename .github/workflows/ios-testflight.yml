@@ -11,7 +11,7 @@ on:
       build_number:
         description: App Store Connect build number
         required: true
-        default: '1'
+        default: '2'
         type: string
 
 permissions:
@@ -31,7 +31,7 @@ jobs:
       APPLE_TEAM_ID: WY6W336UZG
       APP_BUNDLE_ID: uk.acutemedicine.acutemedicaltake
       APP_VERSION: 1.0.0
-      BUILD_NUMBER: ${{ inputs.build_number || '1' }}
+      BUILD_NUMBER: ${{ inputs.build_number || '2' }}
 
     steps:
       - name: Check out repository
@@ -89,9 +89,12 @@ jobs:
             's/CURRENT_PROJECT_VERSION = [0-9]+;/CURRENT_PROJECT_VERSION = $ENV{BUILD_NUMBER};/g' \
             "$project"
 
-          test "$(grep -Fc "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID;" "$project")" -eq 2
-          test "$(grep -Fc "MARKETING_VERSION = $APP_VERSION;" "$project")" -eq 2
-          test "$(grep -Fc "CURRENT_PROJECT_VERSION = $BUILD_NUMBER;" "$project")" -eq 2
+          grep -Fq "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID;" "$project"
+          grep -Fq "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID.widgets;" "$project"
+          grep -Fq "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID.watch;" "$project"
+          test "$(grep -Fc "MARKETING_VERSION = $APP_VERSION;" "$project")" -eq 6
+          test "$(grep -Fc "CURRENT_PROJECT_VERSION = $BUILD_NUMBER;" "$project")" -eq 6
+          ! grep -Fq '<string>armv7</string>' ios/App/App/Info.plist
 
           node --input-type=module <<'NODE'
           import { readFileSync } from 'node:fs';
@@ -104,8 +107,8 @@ jobs:
             throw new Error(`Unexpected iOS app ID: ${config.appId}`);
           }
 
-          if (config.server?.url !== 'https://www.acutemedicaltake.org') {
-            throw new Error(`Unexpected server URL: ${config.server?.url}`);
+          if (config.server?.url) {
+            throw new Error(`Production must use bundled assets, not server.url: ${config.server.url}`);
           }
           NODE
 
@@ -158,6 +161,14 @@ jobs:
           /usr/libexec/PlistBuddy -c 'Add :manageAppVersionAndBuildNumber bool false' "$export_options"
           /usr/libexec/PlistBuddy -c 'Add :stripSwiftSymbols bool true' "$export_options"
           /usr/libexec/PlistBuddy -c 'Add :uploadSymbols bool true' "$export_options"
+
+          profile="$RUNNER_TEMP/AcuteMedicalTake.xcarchive/Products/Applications/App.app/embedded.mobileprovision"
+          entitlements="$RUNNER_TEMP/archive-entitlements.plist"
+          test -f "$profile"
+          security cms -D -i "$profile" > "$RUNNER_TEMP/archive-profile.plist"
+          codesign -d --entitlements :- "$RUNNER_TEMP/AcuteMedicalTake.xcarchive/Products/Applications/App.app" > "$entitlements"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :application-identifier' "$entitlements")" = "$APPLE_TEAM_ID.$APP_BUNDLE_ID"
+          /usr/libexec/PlistBuddy -c 'Print :com.apple.security.application-groups' "$entitlements" | grep -Fq 'group.uk.acutemedicine.acutemedicaltake'
 
           xcodebuild \
             -exportArchive \
