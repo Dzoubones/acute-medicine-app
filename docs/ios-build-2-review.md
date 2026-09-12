@@ -67,7 +67,7 @@ No analytics SDK, AMT server upload, third-party note service, iCloud sync or cl
 - Passed locally: 9 Node feature/release-safety tests.
 - Passed locally: production Vite build and Capacitor iOS sync with six plugins.
 - Passed locally: Xcode project parser validation.
-- GitHub macOS CI diagnosed the initial watchOS target as incorrectly combining a WatchKit 2 container and executable source, which produced two `AMTWatch` binaries. The review branch now packages SwiftUI code in a dedicated WatchKit extension; the corrected rerun is pending.
+- Passed GitHub macOS CI run 6: unsigned iPhone/iPad app build, compiled metadata/architecture checks, WidgetKit target and watchOS app/extension target. CI also diagnosed and verified the correction of an initial duplicate Watch executable packaging conflict.
 - Pending Apple portal setup: App Group and explicit Widget/Watch app/Watch extension App IDs.
 - Pending physical test: install build 2 on the registered iPhone, first/offline launch, upgrade, authentication, notifications and relaunch.
 - Pending visual evidence: iPhone, iPad portrait/landscape/Split View, widgets and Apple Watch after native CI is green.
