@@ -9,17 +9,14 @@ const config: CapacitorConfig = {
     : 'org.acutemedicaltake.app',
   appName: 'Acute Medical Take',
   webDir: 'dist',
-  server: {
-    url: 'https://www.acutemedicaltake.org',
-    cleartext: false,
-    allowNavigation: ['acutemedicaltake.org', 'www.acutemedicaltake.org']
-  },
+  // Production deliberately loads the bundled Vite output. The complete live
+  // website is opened only through @capacitor/browser from clearly labelled UI.
   android: {
     allowMixedContent: false
   },
   ios: {
     contentInset: 'automatic',
-    preferredContentMode: 'mobile',
+    preferredContentMode: 'recommended',
     scrollEnabled: true
   }
 };

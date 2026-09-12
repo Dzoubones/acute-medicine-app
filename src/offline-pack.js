@@ -2,6 +2,7 @@ export const offlineEmergencies = [
   {
     id: 'cardiac-arrest',
     title: 'Cardiac arrest',
+    source: 'Resuscitation Council UK Adult advanced life support guidelines, 2025',
     priority: 'Immediate resuscitation',
     summary: 'Start ALS immediately, minimise interruptions to compressions, identify rhythm, defibrillate shockable rhythms and treat reversible causes.',
     steps: [
@@ -17,6 +18,7 @@ export const offlineEmergencies = [
   {
     id: 'anaphylaxis',
     title: 'Anaphylaxis',
+    source: 'Resuscitation Council UK Emergency treatment of anaphylaxis guideline, 2021',
     priority: 'IM adrenaline first-line',
     summary: 'Recognise airway, breathing or circulation compromise with likely allergic trigger. Give IM adrenaline promptly and repeat if necessary while resuscitating.',
     steps: [
@@ -32,6 +34,7 @@ export const offlineEmergencies = [
   {
     id: 'sepsis',
     title: 'Suspected sepsis',
+    source: 'NICE NG253: Suspected sepsis in people aged 16 or over, published 19 November 2025',
     priority: 'Recognise deterioration and treat time-critical infection',
     summary: 'Assess severity, obtain cultures when this does not delay treatment, give appropriate antimicrobials when indicated, resuscitate and achieve source control.',
     steps: [
@@ -47,6 +50,7 @@ export const offlineEmergencies = [
   {
     id: 'hyperkalaemia',
     title: 'Severe hyperkalaemia',
+    source: 'UK Kidney Association Clinical Practice Guideline: Treatment of Acute Hyperkalaemia in Adults, October 2023',
     priority: 'Protect the myocardium and lower potassium',
     summary: 'Confirm urgently, obtain ECG, stabilise the myocardium when ECG changes are present, shift potassium intracellularly and remove potassium from the body.',
     steps: [
@@ -62,6 +66,7 @@ export const offlineEmergencies = [
   {
     id: 'acute-asthma',
     title: 'Life-threatening asthma',
+    source: 'NICE NG245: Asthma diagnosis, monitoring and chronic asthma management, updated 27 November 2024; use current local acute asthma pathway',
     priority: 'Escalate early for impending respiratory failure',
     summary: 'Treat severe bronchospasm aggressively, reassess frequently and recognise exhaustion, hypoxia, silent chest or rising/normal PaCO₂ as danger signs.',
     steps: [
