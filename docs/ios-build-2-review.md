@@ -17,6 +17,7 @@ The build 1 IPA was not retained as a workflow artifact, so its exact embedded p
 | Main bundle | `uk.acutemedicine.acutemedicaltake` |
 | Widget extension | `uk.acutemedicine.acutemedicaltake.widgets` |
 | Watch app | `uk.acutemedicine.acutemedicaltake.watch` |
+| Watch extension | `uk.acutemedicine.acutemedicaltake.watch.extension` |
 | Version/build | `1.0.0` / `2` |
 | Main minimum OS | iOS/iPadOS 15.0 |
 | Widget minimum OS | iOS/iPadOS 17.0 |
@@ -66,8 +67,8 @@ No analytics SDK, AMT server upload, third-party note service, iCloud sync or cl
 - Passed locally: 9 Node feature/release-safety tests.
 - Passed locally: production Vite build and Capacitor iOS sync with six plugins.
 - Passed locally: Xcode project parser validation.
-- Pending GitHub macOS CI: iPhone/iPad container, WidgetKit and watchOS compilation plus built metadata/architecture checks.
-- Pending Apple portal setup: App Group and explicit Widget/Watch App IDs.
+- GitHub macOS CI diagnosed the initial watchOS target as incorrectly combining a WatchKit 2 container and executable source, which produced two `AMTWatch` binaries. The review branch now packages SwiftUI code in a dedicated WatchKit extension; the corrected rerun is pending.
+- Pending Apple portal setup: App Group and explicit Widget/Watch app/Watch extension App IDs.
 - Pending physical test: install build 2 on the registered iPhone, first/offline launch, upgrade, authentication, notifications and relaunch.
 - Pending visual evidence: iPhone, iPad portrait/landscape/Split View, widgets and Apple Watch after native CI is green.
 
@@ -75,7 +76,7 @@ No analytics SDK, AMT server upload, third-party note service, iCloud sync or cl
 
 1. Build 1's processed IPA/profile is unavailable, so the root cause cannot be proven by binary forensics.
 2. Clinical content and sources require AMT clinician sign-off before external testing or App Review.
-3. Widget/Watch provisioning cannot archive until portal identifiers and App Group are configured.
+3. Widget/Watch app/Watch extension provisioning cannot archive until portal identifiers and App Group are configured.
 4. A physical-device result cannot be claimed until build 2 is signed and installed on the registered iPhone.
 5. Authentication and notification denied states require device validation.
 6. External TestFlight testing may require TestFlight App Review; this change does not submit it.

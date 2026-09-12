@@ -50,13 +50,40 @@ project.parse(error => {
     const group = project.addPbxGroup(['AMTWatch/AMTWatchApp.swift', 'AMTWatch/Info.plist'], 'AMTWatch', '');
     project.addToPbxGroup(group.uuid, rootGroup);
     const target = project.addTarget('AMTWatch', 'watch2_app', 'AMTWatch', 'uk.acutemedicine.acutemedicaltake.watch');
-    project.addBuildPhase(['AMTWatch/AMTWatchApp.swift'], 'PBXSourcesBuildPhase', 'Sources', target.uuid);
+    project.addBuildPhase([], 'PBXSourcesBuildPhase', 'Sources', target.uuid);
     project.addBuildPhase([], 'PBXFrameworksBuildPhase', 'Frameworks', target.uuid);
     project.addBuildPhase([], 'PBXResourcesBuildPhase', 'Resources', target.uuid);
     configure(target, {
       CODE_SIGN_STYLE: 'Automatic', CURRENT_PROJECT_VERSION: '2', DEVELOPMENT_TEAM: 'WY6W336UZG', GENERATE_INFOPLIST_FILE: 'NO',
       INFOPLIST_FILE: 'AMTWatch/Info.plist', MARKETING_VERSION: '1.0.0', PRODUCT_BUNDLE_IDENTIFIER: 'uk.acutemedicine.acutemedicaltake.watch',
       PRODUCT_NAME: '"$(TARGET_NAME)"', SDKROOT: 'watchos', SKIP_INSTALL: 'YES', SWIFT_VERSION: '5.0', TARGETED_DEVICE_FAMILY: '4', WATCHOS_DEPLOYMENT_TARGET: '10.0'
+    });
+  }
+
+  watchKey = project.findTargetKey('"AMTWatch"') || project.findTargetKey('AMTWatch');
+  const watchTarget = objects.PBXNativeTarget[watchKey];
+  for (const phase of watchTarget.buildPhases) {
+    if (objects.PBXSourcesBuildPhase[phase.value]) objects.PBXSourcesBuildPhase[phase.value].files = [];
+  }
+
+  let watchExtensionKey = project.findTargetKey('"AMTWatchExtension"') || project.findTargetKey('AMTWatchExtension');
+  if (!watchExtensionKey) {
+    const group = project.addPbxGroup(['AMTWatchExtension/Info.plist'], 'AMTWatchExtension');
+    project.addToPbxGroup(group.uuid, rootGroup);
+    const target = project.addTarget(
+      'AMTWatchExtension',
+      'watch2_extension',
+      'AMTWatchExtension',
+      'uk.acutemedicine.acutemedicaltake.watch.extension'
+    );
+    project.addBuildPhase(['AMTWatch/AMTWatchApp.swift'], 'PBXSourcesBuildPhase', 'Sources', target.uuid);
+    project.addBuildPhase([], 'PBXFrameworksBuildPhase', 'Frameworks', target.uuid);
+    project.addBuildPhase([], 'PBXResourcesBuildPhase', 'Resources', target.uuid);
+    configure(target, {
+      APPLICATION_EXTENSION_API_ONLY: 'YES', CODE_SIGN_STYLE: 'Automatic', CURRENT_PROJECT_VERSION: '2', DEVELOPMENT_TEAM: 'WY6W336UZG',
+      GENERATE_INFOPLIST_FILE: 'NO', INFOPLIST_FILE: 'AMTWatchExtension/Info.plist', MARKETING_VERSION: '1.0.0',
+      PRODUCT_BUNDLE_IDENTIFIER: 'uk.acutemedicine.acutemedicaltake.watch.extension', PRODUCT_NAME: '"$(TARGET_NAME)"', SDKROOT: 'watchos',
+      SKIP_INSTALL: 'YES', SWIFT_VERSION: '5.0', TARGETED_DEVICE_FAMILY: '4', WATCHOS_DEPLOYMENT_TARGET: '10.0'
     });
   }
 

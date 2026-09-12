@@ -92,8 +92,9 @@ jobs:
           grep -Fq "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID;" "$project"
           grep -Fq "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID.widgets;" "$project"
           grep -Fq "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID.watch;" "$project"
-          test "$(grep -Fc "MARKETING_VERSION = $APP_VERSION;" "$project")" -eq 6
-          test "$(grep -Fc "CURRENT_PROJECT_VERSION = $BUILD_NUMBER;" "$project")" -eq 6
+          grep -Fq "PRODUCT_BUNDLE_IDENTIFIER = $APP_BUNDLE_ID.watch.extension;" "$project"
+          test "$(grep -Fc "MARKETING_VERSION = $APP_VERSION;" "$project")" -eq 8
+          test "$(grep -Fc "CURRENT_PROJECT_VERSION = $BUILD_NUMBER;" "$project")" -eq 8
           ! grep -Fq '<string>armv7</string>' ios/App/App/Info.plist
 
           node --input-type=module <<'NODE'

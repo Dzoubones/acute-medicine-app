@@ -10,7 +10,7 @@
 - Minimum iOS version: `15.0`
 - Primary content: bundled application assets, available offline
 - Optional live reference: `https://www.acutemedicaltake.org` through Capacitor Browser
-- Extension IDs: `uk.acutemedicine.acutemedicaltake.widgets` and `uk.acutemedicine.acutemedicaltake.watch`
+- Extension IDs: `uk.acutemedicine.acutemedicaltake.widgets`, `uk.acutemedicine.acutemedicaltake.watch`, and `uk.acutemedicine.acutemedicaltake.watch.extension`
 - App Group: `group.uk.acutemedicine.acutemedicaltake`
 - Package manager: Swift Package Manager
 

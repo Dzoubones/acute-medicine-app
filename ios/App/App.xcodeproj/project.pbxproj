@@ -26,6 +26,8 @@
 		6ADE04D089F5418AB2274347 /* AMTWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B0C65CBAD07454189C4994C /* AMTWatchApp.swift */; };
 		C53D1122D972429981A055CB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1E375AB2562E47A8A87BDACB /* Info.plist */; };
 		45EAD1C6082F49169F9C5D14 /* AMTWatch.app in Copy Files */ = {isa = PBXBuildFile; fileRef = F0DD302DDAD5411A9C82163C /* AMTWatch.app */; };
+		7CF1FAFEFA8A4027B4F3D824 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F937ADB6BDC34CE39CC5561E /* Info.plist */; };
+		E32ED42F00FD42DD93969213 /* AMTWatchExtension.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = 8C21BB190AAE471CB02012E1 /* AMTWatchExtension.appex */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +53,8 @@
 		3B0C65CBAD07454189C4994C /* AMTWatchApp.swift */ = {isa = PBXFileReference; name = "AMTWatchApp.swift"; path = "AMTWatch/AMTWatchApp.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 		1E375AB2562E47A8A87BDACB /* Info.plist */ = {isa = PBXFileReference; name = "Info.plist"; path = "AMTWatch/Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
 		F0DD302DDAD5411A9C82163C /* AMTWatch.app */ = {isa = PBXFileReference; name = "AMTWatch.app"; path = "AMTWatch.app"; sourceTree = BUILT_PRODUCTS_DIR; fileEncoding = undefined; lastKnownFileType = undefined; explicitFileType = "wrapper.application"; includeInIndex = 0; };
+		F937ADB6BDC34CE39CC5561E /* Info.plist */ = {isa = PBXFileReference; name = "Info.plist"; path = "AMTWatchExtension/Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
+		8C21BB190AAE471CB02012E1 /* AMTWatchExtension.appex */ = {isa = PBXFileReference; name = "AMTWatchExtension.appex"; path = "AMTWatchExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; fileEncoding = undefined; lastKnownFileType = undefined; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +80,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		24E4603662F9413CB8AED45F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -87,6 +98,7 @@
 				504EC3051FED79650016851F /* Products */,
 				F841FC35B5264401B021A162 /* AMTWidgets */,
 				572D15B6AAAE4FE9A10EDCAA /* AMTWatch */,
+				1FEFBDD05F3A4F55B24B068D /* AMTWatchExtension */,
 			);
 			sourceTree = "<group>";
 		};
@@ -96,6 +108,7 @@
 				504EC3041FED79650016851F /* App.app */,
 				25FAA04CC78C4DFF8890ECDC /* AMTWidgets.appex */,
 				F0DD302DDAD5411A9C82163C /* AMTWatch.app */,
+				8C21BB190AAE471CB02012E1 /* AMTWatchExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -137,6 +150,14 @@
 				1E375AB2562E47A8A87BDACB /* Info.plist */,
 			);
 			name = AMTWatch;
+			sourceTree = "<group>";
+		};
+		1FEFBDD05F3A4F55B24B068D /* AMTWatchExtension */ = {
+			isa = PBXGroup;
+			children = (
+				F937ADB6BDC34CE39CC5561E /* Info.plist */,
+			);
+			name = AMTWatchExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -194,6 +215,25 @@
 				EEA7C93E39FF4E3FA0A4D37F /* Sources */,
 				780B70BF915242E090FCB320 /* Frameworks */,
 				B69798D7A12D4AD897AEB4BC /* Resources */,
+				CEFD8B2305FB4FB68AEDE55B /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F3E96FEC082B4D4CBE0F1F28 /* PBXTargetDependency */,
+			);
+		};
+		04BFE76A58EB4A92865AB7E5 /* "AMTWatchExtension" */ = {
+			isa = PBXNativeTarget;
+			name = "AMTWatchExtension";
+			productName = "AMTWatchExtension";
+			productReference = 8C21BB190AAE471CB02012E1;
+			productType = "com.apple.product-type.watchkit2-extension";
+			buildConfigurationList = 33F0A7FD40734287A5A28AF7;
+			buildPhases = (
+				B3D4463B36DF4B6685D0F47D /* Sources */,
+				24E4603662F9413CB8AED45F /* Frameworks */,
+				462904D3017F43E2AB7A5BCB /* Resources */,
 			);
 			buildRules = (
 			);
@@ -235,6 +275,7 @@
 				504EC3031FED79650016851F /* App */,
 				8B720DFB13D54F1E874A71FE /* "AMTWidgets" */,
 				B8656878DE0248FA963B99DA /* "AMTWatch" */,
+				04BFE76A58EB4A92865AB7E5 /* "AMTWatchExtension" */,
 			);
 		};
 /* End PBXProject section */
@@ -267,6 +308,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		462904D3017F43E2AB7A5BCB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -291,6 +339,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		EEA7C93E39FF4E3FA0A4D37F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B3D4463B36DF4B6685D0F47D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -569,6 +624,52 @@
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 		};
+		DB10FE2B06364F469BB1AE17 /* Debug */ = {
+			name = Debug;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = AMTWatchExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = uk.acutemedicine.acutemedicaltake.watch.extension;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = WY6W336UZG;
+				GENERATE_INFOPLIST_FILE = NO;
+				MARKETING_VERSION = 1.0.0;
+				SDKROOT = watchos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+		};
+		8F875D5C69AA447A832F4BE9 /* Release */ = {
+			name = Release;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = AMTWatchExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = uk.acutemedicine.acutemedicaltake.watch.extension;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = WY6W336UZG;
+				GENERATE_INFOPLIST_FILE = NO;
+				MARKETING_VERSION = 1.0.0;
+				SDKROOT = watchos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -608,6 +709,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		33F0A7FD40734287A5A28AF7 /* Build configuration list for PBXNativeTarget "AMTWatchExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB10FE2B06364F469BB1AE17 /* Debug */,
+				8F875D5C69AA447A832F4BE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -640,6 +750,13 @@
 			remoteGlobalIDString = B8656878DE0248FA963B99DA;
 			remoteInfo = "AMTWatch";
 		};
+		A1ACE7FA73A44F5EB99E3E0E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04BFE76A58EB4A92865AB7E5;
+			remoteInfo = "AMTWatchExtension";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXTargetDependency section */
@@ -652,6 +769,11 @@
 			isa = PBXTargetDependency;
 			target = B8656878DE0248FA963B99DA /* "AMTWatch" */;
 			targetProxy = DFA6CAEAE66643EF811ECBC3 /* PBXContainerItemProxy */;
+		};
+		F3E96FEC082B4D4CBE0F1F28 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04BFE76A58EB4A92865AB7E5 /* "AMTWatchExtension" */;
+			targetProxy = A1ACE7FA73A44F5EB99E3E0E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -677,6 +799,17 @@
 			name = "Embed Watch Content";
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
+		};
+		CEFD8B2305FB4FB68AEDE55B /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E32ED42F00FD42DD93969213 /* "AMTWatchExtension.appex" in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			name = "Embed App Extensions";
+			dstPath = "";
+			dstSubfolderSpec = 13;
 		};
 /* End PBXCopyFilesBuildPhase section */
 	};
