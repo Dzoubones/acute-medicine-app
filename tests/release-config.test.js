@@ -26,6 +26,6 @@ test('all review targets use the approved bundle namespace and version', () => {
 
 test('Face ID copy and App Group entitlements are declared', () => {
   assert.match(plist, /NSFaceIDUsageDescription/);
-  assert.match(readFileSync('ios/App/App/App.entitlements', 'utf8'), /group\.uk\.acutemedicine\.acutemedicaltake/);
-  assert.match(readFileSync('ios/App/AMTWidgets/AMTWidgets.entitlements', 'utf8'), /group\.uk\.acutemedicine\.acutemedicaltake/);
+  assert.match(readFileSync('ios/App/App/App.entitlements', 'utf8'), /group\.uk\.acutemedicine\.acutemedicaltake\.shared/);
+  assert.match(readFileSync('ios/App/AMTWidgets/AMTWidgets.entitlements', 'utf8'), /group\.uk\.acutemedicine\.acutemedicaltake\.shared/);
 });

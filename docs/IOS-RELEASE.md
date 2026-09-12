@@ -11,7 +11,7 @@
 - Primary content: bundled application assets, available offline
 - Optional live reference: `https://www.acutemedicaltake.org` through Capacitor Browser
 - Extension IDs: `uk.acutemedicine.acutemedicaltake.widgets`, `uk.acutemedicine.acutemedicaltake.watch`, and `uk.acutemedicine.acutemedicaltake.watch.extension`
-- App Group: `group.uk.acutemedicine.acutemedicaltake`
+- App Group: `group.uk.acutemedicine.acutemedicaltake.shared`
 - Package manager: Swift Package Manager
 
 The iOS project, web bundle, AMT icon, splash screen and Capacitor plugins are

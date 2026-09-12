@@ -1,7 +1,7 @@
 import SwiftUI
 import WidgetKit
 
-private let appGroup = "group.uk.acutemedicine.acutemedicaltake"
+private let appGroup = "group.uk.acutemedicine.acutemedicaltake.shared"
 
 struct AMTEntry: TimelineEntry {
     let date: Date

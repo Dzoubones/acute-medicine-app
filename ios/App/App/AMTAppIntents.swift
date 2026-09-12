@@ -6,7 +6,7 @@ private protocol AMTRouteIntent: AppIntent {}
 
 @available(iOS 16.0, *)
 private func storeRoute(_ route: String) {
-    UserDefaults(suiteName: "group.uk.acutemedicine.acutemedicaltake")?.set(route, forKey: "pendingRoute")
+    UserDefaults(suiteName: "group.uk.acutemedicine.acutemedicaltake.shared")?.set(route, forKey: "pendingRoute")
 }
 
 @available(iOS 16.0, *)

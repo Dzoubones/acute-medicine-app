@@ -19,7 +19,7 @@ final class AMTNativeFeaturesPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "consumePendingRoute", returnType: CAPPluginReturnPromise)
     ]
 
-    private let appGroup = "group.uk.acutemedicine.acutemedicaltake"
+    private let appGroup = "group.uk.acutemedicine.acutemedicaltake.shared"
     private let keyAccount = "encrypted-notes-key-v1"
     private let keyService = "uk.acutemedicine.acutemedicaltake.secure-notes"
     private var unlockedUntil = Date.distantPast

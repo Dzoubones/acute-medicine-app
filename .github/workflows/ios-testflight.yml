@@ -169,7 +169,7 @@ jobs:
           security cms -D -i "$profile" > "$RUNNER_TEMP/archive-profile.plist"
           codesign -d --entitlements :- "$RUNNER_TEMP/AcuteMedicalTake.xcarchive/Products/Applications/App.app" > "$entitlements"
           test "$(/usr/libexec/PlistBuddy -c 'Print :application-identifier' "$entitlements")" = "$APPLE_TEAM_ID.$APP_BUNDLE_ID"
-          /usr/libexec/PlistBuddy -c 'Print :com.apple.security.application-groups' "$entitlements" | grep -Fq 'group.uk.acutemedicine.acutemedicaltake'
+          /usr/libexec/PlistBuddy -c 'Print :com.apple.security.application-groups' "$entitlements" | grep -Fq 'group.uk.acutemedicine.acutemedicaltake.shared'
 
           xcodebuild \
             -exportArchive \

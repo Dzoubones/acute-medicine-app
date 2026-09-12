@@ -8,13 +8,13 @@ Create these records under **AMT DIGITAL HEALTH LIMITED** (`WY6W336UZG`) before 
 | WidgetKit extension | `uk.acutemedicine.acutemedicaltake.widgets` | App Groups | App Store extension profile; development profile for device testing |
 | watchOS app | `uk.acutemedicine.acutemedicaltake.watch` | Watch companion relationship | App Store watch profile; development profile for paired-device testing |
 | watchOS extension | `uk.acutemedicine.acutemedicaltake.watch.extension` | WatchKit extension relationship | App Store extension profile; development profile for paired-device testing |
-| Shared container | `group.uk.acutemedicine.acutemedicaltake` | App Group | Assign only to main app and widget extension |
+| Shared container | `group.uk.acutemedicine.acutemedicaltake.shared` | App Group | Assign only to main app and widget extension |
 
 LocalAuthentication, CryptoKit, Keychain, local notifications, App Intents and WatchConnectivity need no additional portal capability.
 
 ## Portal steps
 
-1. Add App Group `group.uk.acutemedicine.acutemedicaltake`.
+1. Add App Group `group.uk.acutemedicine.acutemedicaltake.shared`.
 2. Enable App Groups on the existing main App ID and select it.
 3. Create the explicit Widget App ID and select the same App Group.
 4. Create the explicit watchOS app and WatchKit extension App IDs beneath the verified namespace.
