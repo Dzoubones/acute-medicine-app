@@ -1,0 +1,13 @@
+{
+	"appId": "org.acutemedicaltake.app",
+	"appName": "Acute Medical Take",
+	"webDir": "dist",
+	"android": {
+		"allowMixedContent": false
+	},
+	"ios": {
+		"contentInset": "automatic",
+		"preferredContentMode": "recommended",
+		"scrollEnabled": true
+	}
+}
