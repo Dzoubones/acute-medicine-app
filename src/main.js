@@ -13,6 +13,9 @@ import { TAKE_GROUPS, TAKE_PRESENTATIONS, TIMER_PRESETS, createTimer, formatDura
 const SITE = 'https://www.acutemedicaltake.org';
 const REVIEW_DATE = '12 September 2026';
 const NativeFeatures = registerPlugin('AMTNativeFeatures');
+const Billing = registerPlugin('AMTBilling');
+const isAndroid = Capacitor.getPlatform() === 'android';
+const PRO_TABS = new Set(['take', 'timers', 'notes', 'pro']);
 const app = document.querySelector('#app');
 
 const sections = [
@@ -39,6 +42,14 @@ let answered = false;
 let notesUnlocked = false;
 let notesText = '';
 let ticker;
+let billingStatus = {
+  productId: 'amt_pro_lifetime',
+  entitled: !isAndroid,
+  pending: false,
+  available: !isAndroid,
+  price: '£9.99',
+  offline: false
+};
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
 const safeHaptic = async () => { try { await Haptics.impact({ style: ImpactStyle.Light }); } catch (_) {} };
@@ -49,6 +60,13 @@ async function loadState() {
   favourites = new Set(await readJSON('amt-favourites', []));
   takeSession = await readJSON('amt-take-session-v1', null);
   activeTimer = await readJSON('amt-active-timer-v1', null);
+  if (isAndroid) {
+    try {
+      billingStatus = { ...billingStatus, ...(await Billing.getStatus()) };
+    } catch (_) {
+      billingStatus.offline = true;
+    }
+  }
 }
 
 async function shareWidgetState() {
@@ -75,7 +93,8 @@ function sectionCard(section) {
 }
 
 function homeView() {
-  return `${header()}<main class="content"><section class="hero"><span class="hero-kicker">Bundled native companion · works offline</span><h2>Acute medicine, organised for the take.</h2><p>Use device-only checklists, timers and offline summaries. Open the complete website separately when required.</p><div class="hero-actions"><button class="primary" data-tab="take">Start AMT Take Mode</button><button class="secondary" id="open-site">Open complete live website ↗</button></div></section><section class="quick-grid"><button class="quick danger" data-tab="offline"><span>⚡</span><b>Offline</b></button><button class="quick" data-tab="timers"><span>◷</span><b>Timers</b></button><button class="quick" data-tab="saved"><span>★</span><b>Favourites</b></button><button class="quick pro" data-tab="pro"><span>A+</span><b>AMT Pro</b></button></section><div class="section-heading"><div><span class="eyebrow">BUNDLED NAVIGATOR</span><h3>Clinical pathways</h3></div></div><section class="card-list">${sections.slice(0, 8).map(sectionCard).join('')}</section>${governanceBox()}</main>`;
+  const lock = isAndroid && !billingStatus.entitled ? ' · 🔒 Pro' : '';
+  return `${header()}<main class="content"><section class="hero"><span class="hero-kicker">Bundled native companion · works offline</span><h2>Acute medicine, organised for the take.</h2><p>Use device-only checklists, timers and offline summaries. Open the complete website separately when required.</p><div class="hero-actions"><button class="primary" data-tab="take">Start AMT Take Mode${lock}</button><button class="secondary" id="open-site">Open complete live website ↗</button></div></section><section class="quick-grid"><button class="quick danger" data-tab="offline"><span>⚡</span><b>Offline</b></button><button class="quick" data-tab="timers"><span>◷</span><b>Timers${lock}</b></button><button class="quick" data-tab="saved"><span>★</span><b>Favourites</b></button><button class="quick pro" data-tab="pro"><span>A+</span><b>${billingStatus.entitled ? 'AMT Pro ✓' : 'Unlock Pro'}</b></button></section><div class="section-heading"><div><span class="eyebrow">BUNDLED NAVIGATOR</span><h3>Clinical pathways</h3></div></div><section class="card-list">${sections.slice(0, 8).map(sectionCard).join('')}</section>${governanceBox()}</main>`;
 }
 
 function savedView() {
@@ -111,9 +130,9 @@ function timersView() {
 }
 
 function notesView() {
-  if (!Capacitor.isNativePlatform()) return `${header()}<main class="content"><div class="page-title"><h2>Secured personal notes</h2><p>Available only inside the native iOS app.</p></div></main>`;
-  if (!notesUnlocked) return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">ENCRYPTED · DEVICE ONLY</span><h2>Secured personal notes</h2><p>Protected by Face ID, Touch ID or device passcode. Cloud sync is disabled.</p></div><div class="warning"><b>Do not enter identifiable patient information.</b><p>Notes must not contain names, NHS numbers, dates of birth, addresses or identifiable clinical information.</p></div><button class="primary" id="unlock-notes">Unlock securely</button></main>`;
-  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">UNLOCKED FOR THIS SESSION</span><h2>Personal notes</h2><p>Encrypted with CryptoKit; the key is held in Keychain.</p></div><div class="warning compact"><b>Do not enter identifiable patient information.</b></div><textarea id="secure-notes" class="notes-field" maxlength="12000" autocomplete="off" spellcheck="true" aria-label="Encrypted personal notes">${escapeHTML(notesText)}</textarea><div class="danger-actions"><button class="primary" id="save-notes">Encrypt and save</button><button class="destructive" id="delete-notes">Permanently delete all notes</button></div></main>`;
+  if (!Capacitor.isNativePlatform()) return `${header()}<main class="content"><div class="page-title"><h2>Secured personal notes</h2><p>Available only inside the native mobile app.</p></div></main>`;
+  if (!notesUnlocked) return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">ENCRYPTED · DEVICE ONLY</span><h2>Secured personal notes</h2><p>Protected by ${isAndroid ? 'fingerprint, face or device passcode' : 'Face ID, Touch ID or device passcode'}. Cloud sync is disabled.</p></div><div class="warning"><b>Do not enter identifiable patient information.</b><p>Notes must not contain names, NHS numbers, dates of birth, addresses or identifiable clinical information.</p></div><button class="primary" id="unlock-notes">Unlock securely</button></main>`;
+  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">UNLOCKED FOR THIS SESSION</span><h2>Personal notes</h2><p>Encrypted with ${isAndroid ? 'Android Keystore' : 'CryptoKit; the key is held in Keychain'}.</p></div><div class="warning compact"><b>Do not enter identifiable patient information.</b></div><textarea id="secure-notes" class="notes-field" maxlength="12000" autocomplete="off" spellcheck="true" aria-label="Encrypted personal notes">${escapeHTML(notesText)}</textarea><div class="danger-actions"><button class="primary" id="save-notes">Encrypt and save</button><button class="destructive" id="delete-notes">Permanently delete all notes</button></div></main>`;
 }
 
 function proView() {
@@ -121,8 +140,20 @@ function proView() {
   return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">AMT PRO · STARTER SET</span><h2>Question ${currentQuestion + 1} of ${mrcpSet1.length}</h2><p>Score ${score}/${mrcpSet1.length}</p></div><div class="question-card"><div class="question-topic">${q.topic}</div><p class="question-stem">${q.stem}</p><div class="answer-list">${q.options.map((option, index) => `<button class="answer-btn" data-answer="${index}" ${answered ? 'disabled' : ''}><span>${String.fromCharCode(65 + index)}</span>${option}</button>`).join('')}</div><div id="answer-feedback"></div></div><div class="pro-actions"><button class="secondary" data-live-topic="${q.pathway}">Review complete pathway ↗</button>${answered ? `<button class="primary" id="next-question">${currentQuestion === mrcpSet1.length - 1 ? 'Restart set' : 'Next question'}</button>` : ''}</div>${governanceBox()}</main>`;
 }
 
+function purchaseView() {
+  const state = billingStatus.pending
+    ? '<div class="warning"><b>Purchase pending</b><p>AMT Pro will unlock after Google Play confirms payment.</p></div>'
+    : billingStatus.offline
+      ? '<div class="warning compact"><b>Offline</b><p>The last verified entitlement is being used until Google Play reconnects.</p></div>'
+      : '';
+  const action = billingStatus.entitled
+    ? '<div class="success-box"><b>AMT Pro Lifetime is unlocked</b><p>Your one-time purchase is active on this Google Play account.</p></div><button class="primary" data-tab="take">Open AMT Take Mode</button>'
+    : `<button class="primary" id="purchase-pro" ${billingStatus.available ? '' : 'disabled'}>Unlock AMT Pro Lifetime · ${escapeHTML(billingStatus.price || '£9.99')}</button><button class="secondary" id="restore-pro">Restore purchase</button>${billingStatus.available ? '' : '<p class="purchase-help">The purchase button becomes active when this build is installed from a Google Play test or production track and the product is activated.</p>'}`;
+  return `${header()}<main class="content"><section class="pro-hero"><span class="hero-kicker">ONE PAYMENT · LIFETIME ACCESS</span><h2>AMT Pro</h2><p>Unlock the complete professional toolkit. No subscription.</p><div class="price">${escapeHTML(billingStatus.price || '£9.99')} <small>once only</small></div></section>${state}<section class="feature-list"><div><span>✓</span><p><b>Complete AMT Take Mode</b><small>Device-only acute-take checklist</small></p></div><div><span>✓</span><p><b>All clinical timer presets</b><small>Local reminders that do not replace monitoring</small></p></div><div><span>✓</span><p><b>Biometric-secured encrypted notes</b><small>Stored only on this device; never enter patient-identifiable data</small></p></div><div><span>✓</span><p><b>AMT Pro starter questions</b><small>Concise clinical learning with explanations</small></p></div><div><span>✓</span><p><b>Future eligible AMT Pro enhancements</b><small>Including selected MRCP(UK) revision resources planned for future updates</small></p></div></section><div class="purchase-actions">${action}</div><section class="free-remains"><b>Always included free</b><p>Clinical pathway navigation, topic search, saved guidance, referenced information and offline emergency orientation remain available without purchase.</p></section>${governanceBox()}</main>`;
+}
+
 function moreView() {
-  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">APP-EXCLUSIVE TOOLS</span><h2>More</h2></div><section class="menu-list"><button data-tab="notes"><b>Face ID-secured notes</b><span>Encrypted device-only notes ›</span></button><button data-tab="pro"><b>AMT Pro</b><span>MRCP Part 2 starter questions ›</span></button><button id="open-site-more"><b>Complete live website ↗</b><span>Securely opens acutemedicaltake.org in the in-app browser</span></button><div><b>Siri and widgets</b><span>Quick pathways, emergencies, favourites and timer actions are available from iOS.</span></div><div><b>Version</b><span>1.0.0 (2) review build</span></div></section>${governanceBox()}</main>`;
+  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">APP-EXCLUSIVE TOOLS</span><h2>More</h2></div><section class="menu-list"><button data-tab="notes"><b>${isAndroid ? 'Biometric-secured' : 'Face ID-secured'} notes</b><span>Encrypted device-only notes ›</span></button><button data-tab="pro"><b>AMT Pro ${billingStatus.entitled ? '✓' : '· £9.99 lifetime'}</b><span>Professional toolkit and starter questions ›</span></button><button id="open-site-more"><b>Complete live website ↗</b><span>Securely opens acutemedicaltake.org in the in-app browser</span></button>${isAndroid ? '' : '<div><b>Siri and widgets</b><span>Quick pathways, emergencies, favourites and timer actions are available from iOS.</span></div>'}<div><b>Version</b><span>${isAndroid ? '1.2.0 (2) Android review build' : '1.0.0 (2) review build'}</span></div></section>${governanceBox()}</main>`;
 }
 
 function bottomNav() {
@@ -201,6 +232,26 @@ function attachEvents() {
   document.querySelector('#next-question')?.addEventListener('click', () => { currentQuestion = (currentQuestion + 1) % mrcpSet1.length; if (!currentQuestion) score = 0; answered = false; render(); });
   document.querySelector('#open-site')?.addEventListener('click', () => openLive());
   document.querySelector('#open-site-more')?.addEventListener('click', () => openLive());
+  document.querySelector('#purchase-pro')?.addEventListener('click', async () => {
+    try {
+      const status = await Billing.purchase();
+      if (status.cancelled) return;
+      billingStatus = { ...billingStatus, ...status };
+      if (billingStatus.entitled) alert('AMT Pro Lifetime is now unlocked.');
+      render();
+    } catch (error) {
+      alert(error?.message || 'The Google Play purchase could not be completed.');
+    }
+  });
+  document.querySelector('#restore-pro')?.addEventListener('click', async () => {
+    try {
+      billingStatus = { ...billingStatus, ...(await Billing.restore()) };
+      alert(billingStatus.entitled ? 'AMT Pro purchase restored.' : 'No AMT Pro purchase was found for this Google Play account.');
+      render();
+    } catch (error) {
+      alert(error?.message || 'The purchase could not be restored.');
+    }
+  });
   document.querySelector('#search-input')?.addEventListener('input', event => { const query = event.target.value.trim().toLowerCase(); const results = sections.filter(item => `${item.title} ${item.subtitle}`.toLowerCase().includes(query)); document.querySelector('#search-results').innerHTML = results.length ? results.map(sectionCard).join('') : '<div class="empty"><h3>No bundled match</h3><p>Try another term or open the complete website.</p></div>'; });
   refreshNetworkPill();
 }
@@ -208,7 +259,8 @@ function attachEvents() {
 function render() {
   clearInterval(ticker);
   const views = { home: homeView, take: takeView, timers: timersView, search: searchView, saved: savedView, offline: offlineView, notes: notesView, pro: proView, more: moreView };
-  app.innerHTML = `<div class="app-shell">${ipadSidebar()}<div class="app-main">${(views[currentTab] || homeView)()}${bottomNav()}</div></div>`;
+  const view = isAndroid && PRO_TABS.has(currentTab) && !billingStatus.entitled ? purchaseView : (views[currentTab] || homeView);
+  app.innerHTML = `<div class="app-shell">${ipadSidebar()}<div class="app-main">${view()}${bottomNav()}</div></div>`;
   attachEvents();
   if (currentTab === 'timers' && activeTimer?.status === 'running') ticker = setInterval(() => { const clock = document.querySelector('#timer-clock'); if (clock) clock.textContent = formatDuration(timerRemaining(activeTimer)); }, 1000);
 }
@@ -226,4 +278,11 @@ App.addListener('appUrlOpen', ({ url }) => routeFromURL(url));
 LocalNotifications.addListener('localNotificationActionPerformed', () => { currentTab = 'timers'; render(); });
 if (Capacitor.isNativePlatform()) {
   try { const pending = await NativeFeatures.consumePendingRoute(); if (pending.route) routeFromURL(`acutemedicaltake://${pending.route}`); } catch (_) {}
+}
+if (isAndroid) {
+  Billing.addListener('purchaseChanged', status => {
+    billingStatus = { ...billingStatus, ...status };
+    render();
+  });
+  Billing.addListener('billingWarning', event => alert(event.message));
 }

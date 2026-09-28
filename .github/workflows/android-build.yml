@@ -2,10 +2,24 @@ name: Android build
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'android/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.ts'
+      - '.github/workflows/android-build.yml'
   push:
     branches: [ main ]
     paths:
       - 'android/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.ts'
       - '.github/workflows/android-build.yml'
 
 jobs:
@@ -16,32 +30,60 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
-      - name: Set up Android SDK
+      - name: Set up Android 16 SDK
         uses: android-actions/setup-android@v3
-
-      - name: Install Android 16 SDK
-        run: |
-          yes | sdkmanager --licenses >/dev/null
-          sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
-
-      - name: Set up Gradle 9.5
-        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '9.5.0'
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install web dependencies
+        run: npm ci
+
+      - name: Run release configuration tests
+        run: npm test
+
+      - name: Build and sync bundled app
+        run: npm run android:sync
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build installable debug APK
-        run: gradle -p android assembleDebug
+        run: bash android/gradlew -p android assembleDebug
 
       - name: Build release App Bundle
-        run: gradle -p android bundleRelease
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            KEYSTORE_PATH="$RUNNER_TEMP/amt-upload.jks"
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
+            ANDROID_KEYSTORE_PATH="$KEYSTORE_PATH" bash android/gradlew -p android bundleRelease
+            SOURCE_AAB="$(find android/app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' -print -quit)"
+            test -n "$SOURCE_AAB"
+            cp "$SOURCE_AAB" android/app/build/outputs/bundle/release/acute-medical-take-1.2.0-signed.aab
+          else
+            bash android/gradlew -p android bundleRelease
+            SOURCE_AAB="$(find android/app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' -print -quit)"
+            test -n "$SOURCE_AAB"
+            cp "$SOURCE_AAB" android/app/build/outputs/bundle/release/acute-medical-take-1.2.0-unsigned.aab
+          fi
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -49,8 +91,8 @@ jobs:
           name: acute-medical-take-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Upload unsigned release bundle
+      - name: Upload release bundle
         uses: actions/upload-artifact@v4
         with:
-          name: acute-medical-take-release-aab-unsigned
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          name: acute-medical-take-release-aab
+          path: android/app/build/outputs/bundle/release/acute-medical-take-1.2.0-*.aab
