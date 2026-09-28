@@ -75,10 +75,14 @@ jobs:
             KEYSTORE_PATH="$RUNNER_TEMP/amt-upload.jks"
             printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
             ANDROID_KEYSTORE_PATH="$KEYSTORE_PATH" ./android/gradlew -p android bundleRelease
-            cp android/app/build/outputs/bundle/release/app-release.aab android/app/build/outputs/bundle/release/acute-medical-take-1.2.0-signed.aab
+            SOURCE_AAB="$(find android/app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' -print -quit)"
+            test -n "$SOURCE_AAB"
+            cp "$SOURCE_AAB" android/app/build/outputs/bundle/release/acute-medical-take-1.2.0-signed.aab
           else
             ./android/gradlew -p android bundleRelease
-            cp android/app/build/outputs/bundle/release/app-release.aab android/app/build/outputs/bundle/release/acute-medical-take-1.2.0-unsigned.aab
+            SOURCE_AAB="$(find android/app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' -print -quit)"
+            test -n "$SOURCE_AAB"
+            cp "$SOURCE_AAB" android/app/build/outputs/bundle/release/acute-medical-take-1.2.0-unsigned.aab
           fi
 
       - name: Upload debug APK
