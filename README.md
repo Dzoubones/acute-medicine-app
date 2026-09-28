@@ -10,7 +10,7 @@ remote website wrapper.
 - Package: `org.acutemedicaltake.app`
 - Version: `1.2.0` (`versionCode 2`)
 - Android API: minimum 26, target/compile 36
-- Java 17, Android Gradle Plugin 8.13.0, Gradle wrapper 8.14.3
+- Java 21, Android Gradle Plugin 8.13.0, Gradle wrapper 8.14.3
 - Google Play Billing Library 9.1.0
 - One-time, non-consumable AMT Pro product: `amt_pro_lifetime`
 - Android Keystore AES-GCM encrypted notes protected by biometrics or device credentials
