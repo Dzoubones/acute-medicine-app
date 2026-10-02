@@ -3,6 +3,7 @@ import CryptoKit
 import Foundation
 import LocalAuthentication
 import Security
+import StoreKit
 import WatchConnectivity
 import WidgetKit
 
@@ -16,13 +17,17 @@ final class AMTNativeFeaturesPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "saveSecureNotes", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteSecureNotes", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "updateSharedState", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "consumePendingRoute", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "consumePendingRoute", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getProEntitlement", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "purchasePro", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "restorePro", returnType: CAPPluginReturnPromise)
     ]
 
     private let appGroup = "group.uk.acutemedicine.acutemedicaltake.shared"
     private let keyAccount = "encrypted-notes-key-v1"
     private let keyService = "uk.acutemedicine.acutemedicaltake.secure-notes"
     private var unlockedUntil = Date.distantPast
+    private let proProductID = "uk.acutemedicine.acutemedicaltake.pro.lifetime"
 
     @objc func authenticate(_ call: CAPPluginCall) {
         let context = LAContext()
@@ -98,6 +103,65 @@ final class AMTNativeFeaturesPlugin: CAPPlugin, CAPBridgedPlugin {
         let route = defaults?.string(forKey: "pendingRoute") ?? ""
         defaults?.removeObject(forKey: "pendingRoute")
         call.resolve(["route": route])
+    }
+
+    @objc func getProEntitlement(_ call: CAPPluginCall) {
+        Task {
+            let entitled = await hasProEntitlement()
+            await MainActor.run { call.resolve(["entitled": entitled, "productId": proProductID]) }
+        }
+    }
+
+    @objc func purchasePro(_ call: CAPPluginCall) {
+        Task {
+            do {
+                guard let product = try await Product.products(for: [proProductID]).first else {
+                    await MainActor.run { call.reject("AMT Pro Lifetime is not available from the App Store.") }
+                    return
+                }
+                let result = try await product.purchase()
+                switch result {
+                case .success(let verification):
+                    guard case .verified(let transaction) = verification else {
+                        await MainActor.run { call.reject("The App Store transaction could not be verified.") }
+                        return
+                    }
+                    await transaction.finish()
+                    let entitled = await hasProEntitlement()
+                    await MainActor.run { call.resolve(["entitled": entitled]) }
+                case .pending:
+                    await MainActor.run { call.resolve(["entitled": false, "pending": true]) }
+                case .userCancelled:
+                    await MainActor.run { call.resolve(["entitled": false, "cancelled": true]) }
+                @unknown default:
+                    await MainActor.run { call.reject("Unknown App Store purchase result.") }
+                }
+            } catch {
+                await MainActor.run { call.reject("Unable to complete AMT Pro purchase.", nil, error) }
+            }
+        }
+    }
+
+    @objc func restorePro(_ call: CAPPluginCall) {
+        Task {
+            do {
+                try await AppStore.sync()
+                let entitled = await hasProEntitlement()
+                await MainActor.run { call.resolve(["entitled": entitled]) }
+            } catch {
+                await MainActor.run { call.reject("Unable to restore purchases.", nil, error) }
+            }
+        }
+    }
+
+    private func hasProEntitlement() async -> Bool {
+        for await result in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = result else { continue }
+            if transaction.productID == proProductID && transaction.revocationDate == nil {
+                return true
+            }
+        }
+        return false
     }
 
     private func isUnlocked(_ call: CAPPluginCall) -> Bool {
