@@ -8,6 +8,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { offlineEmergencies } from './offline-pack.js';
 import { mrcpSet1 } from './mrcp-set1.js';
+import { ATLAS_SYSTEMS, ILLUSTRATION_CARDS, previewCards } from './illustration-atlas.js';
 import { TAKE_GROUPS, TAKE_PRESENTATIONS, TIMER_PRESETS, createTimer, formatDuration, newTakeSession, pauseTimer, resumeTimer, timerRemaining, toggleTakeStep } from './clinical-tools.js';
 
 const SITE = 'https://www.acutemedicaltake.org';
@@ -38,6 +39,8 @@ let score = 0;
 let answered = false;
 let notesUnlocked = false;
 let notesText = '';
+let proEntitled = false;
+let activeAtlasSystem = 'All';
 let ticker;
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
@@ -49,6 +52,17 @@ async function loadState() {
   favourites = new Set(await readJSON('amt-favourites', []));
   takeSession = await readJSON('amt-take-session-v1', null);
   activeTimer = await readJSON('amt-active-timer-v1', null);
+  await refreshProEntitlement();
+}
+
+async function refreshProEntitlement() {
+  if (!Capacitor.isNativePlatform()) { proEntitled = false; return; }
+  try {
+    const result = await NativeFeatures.getProEntitlement();
+    proEntitled = result.entitled === true;
+  } catch (_) {
+    proEntitled = false;
+  }
 }
 
 async function shareWidgetState() {
@@ -117,12 +131,30 @@ function notesView() {
 }
 
 function proView() {
+  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">AMT PRO</span><h2>Professional toolkit</h2><p>${proEntitled ? "AMT Pro Lifetime is active on this Apple ID." : "Preview Pro features and unlock the complete professional toolkit."}</p></div><section class="menu-list pro-menu"><button data-tab="atlas"><b>Clinical Illustration Atlas</b><span>${proEntitled ? "Full system-organised collection" : "Preview examples · full collection in AMT Pro"} ›</span></button><button data-tab="mrcp"><b>MRCP starter questions</b><span>Clinical reasoning and pathway review ›</span></button></section>${!proEntitled ? `<section class="pro-paywall"><span class="eyebrow">ONE PAYMENT · LIFETIME ACCESS</span><h3>AMT Pro Lifetime</h3><p>Unlock the complete Clinical Illustration Atlas and eligible AMT Pro features.</p><button class="primary" id="buy-pro">Unlock AMT Pro</button><button class="secondary" id="restore-pro">Restore Purchases</button></section>` : ""}${governanceBox()}</main>`;
+}
+
+function atlasCard(item, locked = false) {
+  const image = `${SITE}/patient-cards/${item.slug}-generated.jpg`;
+  return `<article class="atlas-card ${locked ? "locked" : ""}"><div class="atlas-image-wrap"><img src="${image}" alt="Generated teaching illustration for ${escapeHTML(item.title)}" loading="lazy" onerror="this.closest('.atlas-image-wrap').classList.add('image-missing');this.remove()">${locked ? '<span class="pro-lock">AMT PRO</span>' : ""}</div><div class="atlas-copy"><small>${escapeHTML(item.system)}</small><strong>${escapeHTML(item.title)}</strong>${!locked ? `<button class="atlas-pathway" data-live-topic="${escapeHTML(item.title)}">Open AMT pathway ↗</button>` : ""}</div></article>`;
+}
+
+function atlasView() {
+  if (!proEntitled) {
+    const examples = previewCards();
+    return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">CLINICAL ILLUSTRATION ATLAS · PREVIEW</span><h2>See the clinical picture.</h2><p>Selected generated teaching illustrations are available as examples. The complete system-organised Atlas is included with AMT Pro Lifetime.</p></div><section class="atlas-grid">${examples.map(item => atlasCard(item, false)).join("")}</section><section class="pro-paywall"><span class="eyebrow">FULL COLLECTION</span><h3>Available in AMT Pro</h3><p>Browse the complete illustration library by clinical system and move directly from a card to its Acute Medical Take pathway.</p><button class="primary" id="buy-pro">Unlock AMT Pro</button><button class="secondary" id="restore-pro">Restore Purchases</button></section>${governanceBox("Generated teaching illustrations · verify clinical findings against current guidance")}</main>`;
+  }
+  const cards = activeAtlasSystem === 'All' ? ILLUSTRATION_CARDS : ILLUSTRATION_CARDS.filter(item => item.system === activeAtlasSystem);
+  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">AMT PRO · CLINICAL ILLUSTRATION ATLAS</span><h2>Clinical systems</h2><p>Generated teaching illustrations organised by system. Illustrations support learning and do not substitute for examination or diagnostic media.</p></div><div class="atlas-filters"><button class="${activeAtlasSystem === "All" ? "active" : ""}" data-atlas-system="All">All</button>${ATLAS_SYSTEMS.map(system => `<button class="${activeAtlasSystem === system ? "active" : ""}" data-atlas-system="${escapeHTML(system)}">${escapeHTML(system)}</button>`).join("")}</div><section class="atlas-grid">${cards.length ? cards.map(item => atlasCard(item, false)).join("") : '<div class="empty"><h3>System collection pending asset sync</h3><p>No cards are registered in this review build for this system yet.</p></div>'}</section>${governanceBox("Generated teaching illustrations · verify clinical findings against current guidance")}</main>`;
+}
+
+function mrcpView() {
   const q = mrcpSet1[currentQuestion];
-  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">AMT PRO · STARTER SET</span><h2>Question ${currentQuestion + 1} of ${mrcpSet1.length}</h2><p>Score ${score}/${mrcpSet1.length}</p></div><div class="question-card"><div class="question-topic">${q.topic}</div><p class="question-stem">${q.stem}</p><div class="answer-list">${q.options.map((option, index) => `<button class="answer-btn" data-answer="${index}" ${answered ? 'disabled' : ''}><span>${String.fromCharCode(65 + index)}</span>${option}</button>`).join('')}</div><div id="answer-feedback"></div></div><div class="pro-actions"><button class="secondary" data-live-topic="${q.pathway}">Review complete pathway ↗</button>${answered ? `<button class="primary" id="next-question">${currentQuestion === mrcpSet1.length - 1 ? 'Restart set' : 'Next question'}</button>` : ''}</div>${governanceBox()}</main>`;
+  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">AMT PRO · STARTER SET</span><h2>Question ${currentQuestion + 1} of ${mrcpSet1.length}</h2><p>Score ${score}/${mrcpSet1.length}</p></div><div class="question-card"><div class="question-topic">${q.topic}</div><p class="question-stem">${q.stem}</p><div class="answer-list">${q.options.map((option, index) => `<button class="answer-btn" data-answer="${index}" ${answered ? "disabled" : ""}><span>${String.fromCharCode(65 + index)}</span>${option}</button>`).join("")}</div><div id="answer-feedback"></div></div><div class="pro-actions"><button class="secondary" data-live-topic="${q.pathway}">Review complete pathway ↗</button>${answered ? `<button class="primary" id="next-question">${currentQuestion === mrcpSet1.length - 1 ? "Restart set" : "Next question"}</button>` : ""}</div>${governanceBox()}</main>`;
 }
 
 function moreView() {
-  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">APP-EXCLUSIVE TOOLS</span><h2>More</h2></div><section class="menu-list"><button data-tab="notes"><b>Face ID-secured notes</b><span>Encrypted device-only notes ›</span></button><button data-tab="pro"><b>AMT Pro</b><span>MRCP Part 2 starter questions ›</span></button><button id="open-site-more"><b>Complete live website ↗</b><span>Securely opens acutemedicaltake.org in the in-app browser</span></button><div><b>Siri and widgets</b><span>Quick pathways, emergencies, favourites and timer actions are available from iOS.</span></div><div><b>Version</b><span>1.0.0 (2) review build</span></div></section>${governanceBox()}</main>`;
+  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">APP-EXCLUSIVE TOOLS</span><h2>More</h2></div><section class="menu-list"><button data-tab="notes"><b>Face ID-secured notes</b><span>Encrypted device-only notes ›</span></button><button data-tab="pro"><b>AMT Pro</b><span>Clinical Illustration Atlas + MRCP starter questions ›</span></button><button id="open-site-more"><b>Complete live website ↗</b><span>Securely opens acutemedicaltake.org in the in-app browser</span></button><div><b>Siri and widgets</b><span>Quick pathways, emergencies, favourites and timer actions are available from iOS.</span></div><div><b>Version</b><span>1.0.0 (2) review build</span></div></section>${governanceBox()}</main>`;
 }
 
 function bottomNav() {
@@ -168,6 +200,7 @@ function routeFromURL(url) {
     const route = parsed.protocol === 'acutemedicaltake:' ? parsed.hostname || parsed.pathname.replace('/', '') : parsed.searchParams.get('amt_section') || '';
     const value = route.toLowerCase();
     if (value.includes('timer')) currentTab = 'timers';
+    else if (value.includes('atlas') || value.includes('illustration')) currentTab = 'atlas';
     else if (value.includes('take')) currentTab = 'take';
     else if (value.includes('offline') || value.includes('emerg')) currentTab = 'offline';
     else if (value.includes('favourite') || value.includes('saved')) currentTab = 'saved';
@@ -197,6 +230,9 @@ function attachEvents() {
   document.querySelector('#unlock-notes')?.addEventListener('click', async () => { try { await NativeFeatures.authenticate({ reason: 'Unlock your encrypted Acute Medical Take notes' }); const result = await NativeFeatures.loadSecureNotes(); notesText = result.text || ''; notesUnlocked = true; render(); } catch (_) { alert('Notes remain locked. Authentication was cancelled or is unavailable.'); } });
   document.querySelector('#save-notes')?.addEventListener('click', async () => { notesText = document.querySelector('#secure-notes').value; await NativeFeatures.saveSecureNotes({ text: notesText }); alert('Notes encrypted and saved on this device.'); });
   document.querySelector('#delete-notes')?.addEventListener('click', async () => { if (!confirm('Permanently delete all encrypted notes? This cannot be undone.')) return; await NativeFeatures.deleteSecureNotes(); notesText = ''; notesUnlocked = false; render(); });
+  document.querySelectorAll('[data-atlas-system]').forEach(element => element.addEventListener('click', () => { activeAtlasSystem = element.dataset.atlasSystem; render(); }));
+  document.querySelector('#buy-pro')?.addEventListener('click', async () => { try { const result = await NativeFeatures.purchasePro(); if (result.entitled) { proEntitled = true; currentTab = 'atlas'; render(); } else if (result.pending) alert('Your AMT Pro purchase is pending App Store approval.'); } catch (error) { alert(error?.message || 'Unable to complete AMT Pro purchase.'); } });
+  document.querySelector('#restore-pro')?.addEventListener('click', async () => { try { const result = await NativeFeatures.restorePro(); proEntitled = result.entitled === true; if (proEntitled) { currentTab = 'atlas'; render(); } else alert('No active AMT Pro Lifetime purchase was found for this Apple ID.'); } catch (error) { alert(error?.message || 'Unable to restore purchases.'); } });
   document.querySelectorAll('[data-answer]').forEach(element => element.addEventListener('click', () => { if (answered) return; answered = true; const selected = Number(element.dataset.answer); const q = mrcpSet1[currentQuestion]; if (selected === q.answer) score += 1; render(); const feedback = document.querySelector('#answer-feedback'); if (feedback) feedback.innerHTML = `<div class="feedback ${selected === q.answer ? 'correct' : 'incorrect'}"><b>${selected === q.answer ? 'Correct' : `Best answer: ${String.fromCharCode(65 + q.answer)}`}</b><p>${q.explanation}</p></div>`; }));
   document.querySelector('#next-question')?.addEventListener('click', () => { currentQuestion = (currentQuestion + 1) % mrcpSet1.length; if (!currentQuestion) score = 0; answered = false; render(); });
   document.querySelector('#open-site')?.addEventListener('click', () => openLive());
@@ -207,7 +243,7 @@ function attachEvents() {
 
 function render() {
   clearInterval(ticker);
-  const views = { home: homeView, take: takeView, timers: timersView, search: searchView, saved: savedView, offline: offlineView, notes: notesView, pro: proView, more: moreView };
+  const views = { home: homeView, take: takeView, timers: timersView, search: searchView, saved: savedView, offline: offlineView, notes: notesView, pro: proView, atlas: atlasView, mrcp: mrcpView, more: moreView };
   app.innerHTML = `<div class="app-shell">${ipadSidebar()}<div class="app-main">${(views[currentTab] || homeView)()}${bottomNav()}</div></div>`;
   attachEvents();
   if (currentTab === 'timers' && activeTimer?.status === 'running') ticker = setInterval(() => { const clock = document.querySelector('#timer-clock'); if (clock) clock.textContent = formatDuration(timerRemaining(activeTimer)); }, 1000);
