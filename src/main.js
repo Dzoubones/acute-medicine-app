@@ -8,6 +8,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { offlineEmergencies } from './offline-pack.js';
 import { mrcpSet1 } from './mrcp-set1.js';
+import { matchesReviewCode } from './review-access.js';
 import { TAKE_GROUPS, TAKE_PRESENTATIONS, TIMER_PRESETS, createTimer, formatDuration, newTakeSession, pauseTimer, resumeTimer, timerRemaining, toggleTakeStep } from './clinical-tools.js';
 
 const SITE = 'https://www.acutemedicaltake.org';
@@ -41,6 +42,8 @@ let score = 0;
 let answered = false;
 let notesUnlocked = false;
 let notesText = '';
+let reviewAccessGranted = false;
+let reviewNote = '';
 let ticker;
 let billingStatus = {
   productId: 'amt_pro_lifetime',
@@ -50,6 +53,7 @@ let billingStatus = {
   price: '£9.99',
   offline: false
 };
+const hasProAccess = () => billingStatus.entitled || reviewAccessGranted;
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
 const safeHaptic = async () => { try { await Haptics.impact({ style: ImpactStyle.Light }); } catch (_) {} };
@@ -93,8 +97,8 @@ function sectionCard(section) {
 }
 
 function homeView() {
-  const lock = isAndroid && !billingStatus.entitled ? ' · 🔒 Pro' : '';
-  return `${header()}<main class="content"><section class="hero"><span class="hero-kicker">Bundled native companion · works offline</span><h2>Acute medicine, organised for the take.</h2><p>Use device-only checklists, timers and offline summaries. Open the complete website separately when required.</p><div class="hero-actions"><button class="primary" data-tab="take">Start AMT Take Mode${lock}</button><button class="secondary" id="open-site">Open complete live website ↗</button></div></section><section class="quick-grid"><button class="quick danger" data-tab="offline"><span>⚡</span><b>Offline</b></button><button class="quick" data-tab="timers"><span>◷</span><b>Timers${lock}</b></button><button class="quick" data-tab="saved"><span>★</span><b>Favourites</b></button><button class="quick pro" data-tab="pro"><span>A+</span><b>${billingStatus.entitled ? 'AMT Pro ✓' : 'Unlock Pro'}</b></button></section><div class="section-heading"><div><span class="eyebrow">BUNDLED NAVIGATOR</span><h3>Clinical pathways</h3></div></div><section class="card-list">${sections.slice(0, 8).map(sectionCard).join('')}</section>${governanceBox()}</main>`;
+  const lock = isAndroid && !hasProAccess() ? ' · 🔒 Pro' : '';
+  return `${header()}<main class="content"><section class="hero"><span class="hero-kicker">Bundled native companion · works offline</span><h2>Acute medicine, organised for the take.</h2><p>Use device-only checklists, timers and offline summaries. Open the complete website separately when required.</p><div class="hero-actions"><button class="primary" data-tab="take">Start AMT Take Mode${lock}</button><button class="secondary" id="open-site">Open complete live website ↗</button></div></section><section class="quick-grid"><button class="quick danger" data-tab="offline"><span>⚡</span><b>Offline</b></button><button class="quick" data-tab="timers"><span>◷</span><b>Timers${lock}</b></button><button class="quick" data-tab="saved"><span>★</span><b>Favourites</b></button><button class="quick pro" data-tab="pro"><span>A+</span><b>${hasProAccess() ? 'AMT Pro ✓' : 'Unlock Pro'}</b></button></section><div class="section-heading"><div><span class="eyebrow">BUNDLED NAVIGATOR</span><h3>Clinical pathways</h3></div></div><section class="card-list">${sections.slice(0, 8).map(sectionCard).join('')}</section>${governanceBox()}</main>`;
 }
 
 function savedView() {
@@ -131,6 +135,16 @@ function timersView() {
 
 function notesView() {
   if (!Capacitor.isNativePlatform()) return `${header()}<main class="content"><div class="page-title"><h2>Secured personal notes</h2><p>Available only inside the native mobile app.</p></div></main>`;
+  if (reviewAccessGranted && !billingStatus.entitled && !notesUnlocked) {
+    return `${header()}<main class="content">
+      <div class="page-title"><span class="eyebrow">GOOGLE PLAY REVIEW</span><h2>Secured personal notes</h2>
+        <p>Try the editor with a temporary sample note. Use device authentication to test encrypted storage.</p>
+      </div>
+      <div class="warning compact"><b>Do not enter identifiable patient information.</b></div>
+      <textarea id="review-note" class="notes-field" maxlength="12000" autocomplete="off" aria-label="Sample review note">${escapeHTML(reviewNote)}</textarea>
+      <button class="primary" id="unlock-notes">Unlock securely</button>
+    </main>`;
+  }
   if (!notesUnlocked) return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">ENCRYPTED · DEVICE ONLY</span><h2>Secured personal notes</h2><p>Protected by ${isAndroid ? 'fingerprint, face or device passcode' : 'Face ID, Touch ID or device passcode'}. Cloud sync is disabled.</p></div><div class="warning"><b>Do not enter identifiable patient information.</b><p>Notes must not contain names, NHS numbers, dates of birth, addresses or identifiable clinical information.</p></div><button class="primary" id="unlock-notes">Unlock securely</button></main>`;
   return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">UNLOCKED FOR THIS SESSION</span><h2>Personal notes</h2><p>Encrypted with ${isAndroid ? 'Android Keystore' : 'CryptoKit; the key is held in Keychain'}.</p></div><div class="warning compact"><b>Do not enter identifiable patient information.</b></div><textarea id="secure-notes" class="notes-field" maxlength="12000" autocomplete="off" spellcheck="true" aria-label="Encrypted personal notes">${escapeHTML(notesText)}</textarea><div class="danger-actions"><button class="primary" id="save-notes">Encrypt and save</button><button class="destructive" id="delete-notes">Permanently delete all notes</button></div></main>`;
 }
@@ -141,6 +155,15 @@ function proView() {
 }
 
 function purchaseView() {
+  const reviewerForm = `<details class="free-remains">
+    <summary>Google Play reviewer access</summary>
+    <form id="review-access-form">
+      <label class="field-label" for="review-access-code">Reviewer code</label>
+      <input id="review-access-code" class="field" type="password" maxlength="32" autocomplete="off" autocapitalize="none" required>
+      <button class="secondary" type="submit">Open review session</button>
+      <p id="review-access-status" role="status"></p>
+    </form>
+  </details>`;
   const state = billingStatus.pending
     ? '<div class="warning"><b>Purchase pending</b><p>AMT Pro will unlock after Google Play confirms payment.</p></div>'
     : billingStatus.offline
@@ -149,11 +172,11 @@ function purchaseView() {
   const action = billingStatus.entitled
     ? '<div class="success-box"><b>AMT Pro Lifetime is unlocked</b><p>Your one-time purchase is active on this Google Play account.</p></div><button class="primary" data-tab="take">Open AMT Take Mode</button>'
     : `<button class="primary" id="purchase-pro" ${billingStatus.available ? '' : 'disabled'}>Unlock AMT Pro Lifetime · ${escapeHTML(billingStatus.price || '£9.99')}</button><button class="secondary" id="restore-pro">Restore purchase</button>${billingStatus.available ? '' : '<p class="purchase-help">The purchase button becomes active when this build is installed from a Google Play test or production track and the product is activated.</p>'}`;
-  return `${header()}<main class="content"><section class="pro-hero"><span class="hero-kicker">ONE PAYMENT · LIFETIME ACCESS</span><h2>AMT Pro</h2><p>Unlock the complete professional toolkit. No subscription.</p><div class="price">${escapeHTML(billingStatus.price || '£9.99')} <small>once only</small></div></section>${state}<section class="feature-list"><div><span>✓</span><p><b>Complete AMT Take Mode</b><small>Device-only acute-take checklist</small></p></div><div><span>✓</span><p><b>All clinical timer presets</b><small>Local reminders that do not replace monitoring</small></p></div><div><span>✓</span><p><b>Biometric-secured encrypted notes</b><small>Stored only on this device; never enter patient-identifiable data</small></p></div><div><span>✓</span><p><b>AMT Pro starter questions</b><small>Concise clinical learning with explanations</small></p></div><div><span>✓</span><p><b>Future eligible AMT Pro enhancements</b><small>Including selected MRCP(UK) revision resources planned for future updates</small></p></div></section><div class="purchase-actions">${action}</div><section class="free-remains"><b>Always included free</b><p>Clinical pathway navigation, topic search, saved guidance, referenced information and offline emergency orientation remain available without purchase.</p></section>${governanceBox()}</main>`;
+  return `${header()}<main class="content"><section class="pro-hero"><span class="hero-kicker">ONE PAYMENT · LIFETIME ACCESS</span><h2>AMT Pro</h2><p>Unlock the complete professional toolkit. No subscription.</p><div class="price">${escapeHTML(billingStatus.price || '£9.99')} <small>once only</small></div></section>${state}<section class="feature-list"><div><span>✓</span><p><b>Complete AMT Take Mode</b><small>Device-only acute-take checklist</small></p></div><div><span>✓</span><p><b>All clinical timer presets</b><small>Local reminders that do not replace monitoring</small></p></div><div><span>✓</span><p><b>Biometric-secured encrypted notes</b><small>Stored only on this device; never enter patient-identifiable data</small></p></div><div><span>✓</span><p><b>AMT Pro starter questions</b><small>Concise clinical learning with explanations</small></p></div><div><span>✓</span><p><b>Future eligible AMT Pro enhancements</b><small>Including selected MRCP(UK) revision resources planned for future updates</small></p></div></section><div class="purchase-actions">${action}</div>${reviewerForm}<section class="free-remains"><b>Always included free</b><p>Clinical pathway navigation, topic search, saved guidance, referenced information and offline emergency orientation remain available without purchase.</p></section>${governanceBox()}</main>`;
 }
 
 function moreView() {
-  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">APP-EXCLUSIVE TOOLS</span><h2>More</h2></div><section class="menu-list"><button data-tab="notes"><b>${isAndroid ? 'Biometric-secured' : 'Face ID-secured'} notes</b><span>Encrypted device-only notes ›</span></button><button data-tab="pro"><b>AMT Pro ${billingStatus.entitled ? '✓' : '· £9.99 lifetime'}</b><span>Professional toolkit and starter questions ›</span></button>${isAndroid ? '<button data-url="https://raw.githubusercontent.com/Dzoubones/acute-medicine-app/main/docs/android-privacy.md"><b>Privacy policy ↗</b><span>Android app data and permissions</span></button>' : ''}<button id="open-site-more"><b>Complete live website ↗</b><span>Securely opens acutemedicaltake.org in the in-app browser</span></button>${isAndroid ? '' : '<div><b>Siri and widgets</b><span>Quick pathways, emergencies, favourites and timer actions are available from iOS.</span></div>'}<div><b>Version</b><span>${isAndroid ? '1.2.0 (2) Android review build' : '1.0.0 (2) review build'}</span></div></section>${governanceBox()}</main>`;
+  return `${header()}<main class="content"><div class="page-title"><span class="eyebrow">APP-EXCLUSIVE TOOLS</span><h2>More</h2></div><section class="menu-list"><button data-tab="notes"><b>${isAndroid ? 'Biometric-secured' : 'Face ID-secured'} notes</b><span>Encrypted device-only notes ›</span></button><button data-tab="pro"><b>AMT Pro ${hasProAccess() ? '✓' : '· £9.99 lifetime'}</b><span>Professional toolkit and starter questions ›</span></button>${isAndroid ? '<button data-url="https://raw.githubusercontent.com/Dzoubones/acute-medicine-app/main/docs/android-privacy.md"><b>Privacy policy ↗</b><span>Android app data and permissions</span></button>' : ''}<button id="open-site-more"><b>Complete live website ↗</b><span>Securely opens acutemedicaltake.org in the in-app browser</span></button>${isAndroid ? '' : '<div><b>Siri and widgets</b><span>Quick pathways, emergencies, favourites and timer actions are available from iOS.</span></div>'}<div><b>Version</b><span>${isAndroid ? '1.2.0 (3)' : '1.0.0 (2) review build'}</span></div></section>${governanceBox()}</main>`;
 }
 
 function bottomNav() {
@@ -232,6 +255,27 @@ function attachEvents() {
   document.querySelector('#next-question')?.addEventListener('click', () => { currentQuestion = (currentQuestion + 1) % mrcpSet1.length; if (!currentQuestion) score = 0; answered = false; render(); });
   document.querySelector('#open-site')?.addEventListener('click', () => openLive());
   document.querySelector('#open-site-more')?.addEventListener('click', () => openLive());
+  document.querySelector('#review-note')?.addEventListener('input', event => {
+    reviewNote = event.target.value;
+  });
+  document.querySelector('#review-access-form')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const code = form.querySelector('#review-access-code');
+    const status = form.querySelector('#review-access-status');
+    try {
+      if (isAndroid && await matchesReviewCode(code.value)) {
+        reviewAccessGranted = true;
+        render();
+        return;
+      }
+      status.textContent = 'This reviewer code is invalid.';
+    } catch (_) {
+      status.textContent = 'The code could not be checked. Reopen the app and try again.';
+    } finally {
+      code.value = '';
+    }
+  });
   document.querySelector('#purchase-pro')?.addEventListener('click', async () => {
     try {
       const status = await Billing.purchase();
@@ -259,7 +303,7 @@ function attachEvents() {
 function render() {
   clearInterval(ticker);
   const views = { home: homeView, take: takeView, timers: timersView, search: searchView, saved: savedView, offline: offlineView, notes: notesView, pro: proView, more: moreView };
-  const view = isAndroid && PRO_TABS.has(currentTab) && !billingStatus.entitled ? purchaseView : (views[currentTab] || homeView);
+  const view = isAndroid && PRO_TABS.has(currentTab) && !hasProAccess() ? purchaseView : (views[currentTab] || homeView);
   app.innerHTML = `<div class="app-shell">${ipadSidebar()}<div class="app-main">${view()}${bottomNav()}</div></div>`;
   attachEvents();
   if (currentTab === 'timers' && activeTimer?.status === 'running') ticker = setInterval(() => { const clock = document.querySelector('#timer-clock'); if (clock) clock.textContent = formatDuration(timerRemaining(activeTimer)); }, 1000);

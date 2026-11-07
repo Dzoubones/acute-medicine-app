@@ -16,7 +16,7 @@ const main = readFileSync('src/main.js', 'utf8');
 
 test('Android 1.2.0 uses the established package and current target SDK', () => {
   assert.match(appGradle, /applicationId 'org\.acutemedicaltake\.app'/);
-  assert.match(appGradle, /versionCode 2/);
+  assert.match(appGradle, /versionCode 3/);
   assert.match(appGradle, /versionName '1\.2\.0'/);
   assert.match(appGradle, /JavaVersion\.VERSION_21/);
   assert.match(readFileSync('android/variables.gradle', 'utf8'), /targetSdkVersion\s*=\s*36/);
