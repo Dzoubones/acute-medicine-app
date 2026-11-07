@@ -18,17 +18,20 @@ dump_screen() {
   adb pull /sdcard/amt-listing.xml "$artifact_dir/current.xml" >/dev/null 2>&1
 }
 
-ready=0
-for attempt in $(seq 1 45); do
-  if dump_screen && python3 - "$artifact_dir/current.xml" <<'PY'
+has_screen_text() {
+  python3 - "$artifact_dir/current.xml" "$1" <<'PY'
 import sys
 from xml.etree import ElementTree
 
 root = ElementTree.parse(sys.argv[1]).getroot()
 text = ' '.join(node.get('text', '') + ' ' + node.get('content-desc', '') for node in root.iter())
-raise SystemExit(0 if 'Acute medicine, organised for the take.' in text else 1)
+raise SystemExit(0 if sys.argv[2] in text else 1)
 PY
-  then
+}
+
+ready=0
+for attempt in $(seq 1 45); do
+  if dump_screen && has_screen_text 'Acute medicine, organised for the take.'; then
     ready=1
     break
   fi
@@ -58,10 +61,17 @@ PY
   sleep 2
 }
 
-tap_label Offline
+tap_label '⚡ Offline'
+dump_screen
+has_screen_text 'Offline emergencies'
 adb exec-out screencap -p > "$artifact_dir/02-offline.png"
-tap_label Search
+tap_label '⌕ Search'
+dump_screen
+has_screen_text 'Find a pathway'
 adb exec-out screencap -p > "$artifact_dir/03-search.png"
+tap_label '••• More'
+dump_screen
+has_screen_text 'Privacy policy'
 adb logcat -d -s AndroidRuntime:E chromium:E > "$artifact_dir/launch.log"
 if rg -i 'FATAL EXCEPTION|Fatal signal|Uncaught (TypeError|ReferenceError|SyntaxError)' "$artifact_dir/launch.log"; then
   exit 1
